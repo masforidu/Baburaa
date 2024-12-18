@@ -94,29 +94,24 @@ WSGI_APPLICATION = 'shegar.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Set environment and local PostgreSQL flag
-POSTGRES_LOCALLY = env.bool('POSTGRES_LOCALLY', default=False)
-ENVIRONMENT = env('ENVIRONMENT', default='development')
+DATABASE_URL = os.getenv('DATABASE_URL')
 
-if ENVIRONMENT == 'production':
-    # Use the Railway database in production
+if DATABASE_URL:
     DATABASES = {
-        'default': dj_database_url.parse(env('DATABASE_URL'))
-    }
-elif POSTGRES_LOCALLY:
-    # Use the local PostgreSQL database
-    DATABASES = {
-        'default': dj_database_url.parse(
-            env('DATABASE_URL', default='postgresql://postgres:password@localhost:5432/dbname')
-        )
+        'default': dj_database_url.parse(DATABASE_URL)
     }
 else:
-    # Default to SQLite for development if nothing else is set
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DATABASE_NAME', 'shegarlandbank'),
+            'USER': os.getenv('DATABASE_USER', 'postgres'),
+            'PASSWORD': os.getenv('DATABASE_PASSWORD', 'red17331'),
+            'HOST': os.getenv('DATABASE_HOST', 'localhost'),
+            'PORT': os.getenv('DATABASE_PORT', '5432'),
         }
     }
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
