@@ -16,6 +16,8 @@ import dj_database_url
 from dotenv import load_dotenv
 from environ import Env
 
+
+
 # Initialize environment variables
 env = Env()
 Env.read_env()  # Reads variables from a .env file, if present
@@ -59,6 +61,7 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -94,29 +97,20 @@ WSGI_APPLICATION = 'shegar.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Set environment and local PostgreSQL flag
-POSTGRES_LOCALLY = env.bool('POSTGRES_LOCALLY', default=False)
-ENVIRONMENT = env('ENVIRONMENT', default='development')
-
-if ENVIRONMENT == 'production':
-    # Use the Railway database in production
-    DATABASES = {
-        'default': dj_database_url.parse(env('DATABASE_URL'))
-    }
-elif POSTGRES_LOCALLY:
-    # Use the local PostgreSQL database
-    DATABASES = {
-        'default': dj_database_url.parse(
-            env('DATABASE_URL', default='postgresql://postgres:password@localhost:5432/dbname')
-        )
-    }
-else:
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),  # Railway's DATABASE_URL
+        conn_max_age=600,  # Optional: Maintain persistent connections
+        ssl_require=True  # Enforce SSL for production
+    )
+}
     # Default to SQLite for development if nothing else is set
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+ #   DATABASES = {
+ #       'default': {
+ #          'ENGINE': 'django.db.backends.sqlite3',
+ #           'NAME': BASE_DIR / 'db.sqlite3',
+ #       }
+ #   }
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -129,7 +123,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -139,11 +132,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR/ "staticfiles"
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-
+STATICFILES_STORAGE =  "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
