@@ -16,10 +16,11 @@ COPY requirements.txt /app/
 RUN python -m venv /opt/venv && \
     . /opt/venv/bin/activate && \
     pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install -r requirements.txt && \
+    which gunicorn
 
 # Copy project files
 COPY . /app/
 
 # Command to run the application
-CMD ["gunicorn", "project_name.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "shegar.wsgi:application", "--bind", "0.0.0.0:8000"]
