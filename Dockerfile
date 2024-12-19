@@ -1,4 +1,4 @@
-FROM python:3.10-slim  # Replace with your compatible version
+FROM python:3.12-slim  
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
