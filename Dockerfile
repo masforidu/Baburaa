@@ -1,3 +1,4 @@
+# Replace with your compatible version
 FROM python:3.12-slim  
 
 # Set environment variables
@@ -20,4 +21,5 @@ RUN python -m venv /opt/venv && \
 # Copy project files
 COPY . /app/
 
+# Command to run the application
 CMD ["gunicorn", "project_name.wsgi:application", "--bind", "0.0.0.0:8000"]
