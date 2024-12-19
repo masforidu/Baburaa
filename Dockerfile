@@ -1,20 +1,23 @@
-# Use the official Python image from the Docker Hub
-FROM python:3.10-slim
+FROM python:3.10-slim  # Replace with your compatible version
 
-# Set the working directory in the container
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y build-essential libpq-dev
+
+# Create working directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . .
+# Install Python dependencies
+COPY requirements.txt /app/
+RUN python -m venv /opt/venv && \
+    . /opt/venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy project files
+COPY . /app/
 
-# Make port 8000 available to the world outside this container
-EXPOSE 8000
-
-# Define environment variable
-ENV NAME World
-
-# Run app.py when the container launches
-CMD ["python", "app.py"]
+CMD ["gunicorn", "project_name.wsgi:application", "--bind", "0.0.0.0:8000"]
