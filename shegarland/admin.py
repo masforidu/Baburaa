@@ -30,16 +30,20 @@ class ShegarLandFormAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        'Kutaamagaalaa', 'Aanaa', 'iddo_adda', 'gosa_tajajila', 
-        'madda_lafa', 'haala_beenya', 'qamaa_qophaef',
+        'Kutaamagaalaa', 'Aanaa','lakk_adda', 'iddo_adda', 'qamaa_qophaef','qaama_bahi_tahef','guyya_qophae', 'guyya_galmae',  
+        'madda_lafa','kan_bahi_taasise','qamaa_qophaef','qaama_bahi_tahef','guyyaa_bahi_tae','tajajila_bahi_tahef',
     )
     list_filter = (
         'Kutaamagaalaa',
         'Aanaa',
+         'balina_lafa',
         'gosa_tajajila',
         'madda_lafa',
+        'haala_beenya',
+        'tajajila_qophaef',
+        'tajajila_iddo',
+         'gosa_tajajila',
     )
-
 
     fields = [
         'Kutaamagaalaa', 'Aanaa', 'iddo_adda', 'lakk_adda', 
