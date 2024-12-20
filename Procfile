@@ -1,1 +1,1 @@
-web: gunicorn shegar.wsgi
+web: gunicorn shegar.wsgi:application --bind 0.0.0.0:$PORT
