@@ -79,6 +79,7 @@
                 <th>Bal.Lafa bahi ta'e</th>
                 <th>Balina Lafa Hafe</th>
                 <th>Ragaittin Bahe Tae</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -100,7 +101,6 @@
                 <td>  <a href="{{ submission.shapefile.url }}" class="btn btn-info" download>Shapefile buusi</a>
                 </td>
                 <td>
-                    <a href="{% url 'edit_submission' submission.id %}" class="btn btn-warning btn-sm">Edit</a>
                     {% if submission.Ragaa_biroo %}
                         <img src="{{ submission.Ragaa_biroo.url }}" alt="Ragaa Biroo" width="40">
                     {% else %}
@@ -125,6 +125,11 @@
                         No file available
                     {% endif %}
                 </td>
+            </td> <!-- Updated cell for ragaittin_bahi_tae -->
+            <td>
+                <a href="#" class="btn btn-primary load-geojson" data-geojson-url="{{ submission.shapefile.url }}">Show on Map</a>
+                <a href="{% url 'edit_submission' submission.id %}" class="btn btn-warning">Edit</a>
+            </td>
             </tr>
             {% empty %}
             <tr>

@@ -36,7 +36,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 # SECURITY WARNING: don't run with debug turned on in production
-ALLOWED_HOSTS = ['shegarlandhub.up.railway.app','localhost','http://127.0.0.1:8000/']
+ALLOWED_HOSTS = ['shegarlandhub.up.railway.app','localhost','http://127.0.0.1:8000/','127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
     "https://shegarlandhub.up.railway.app"
