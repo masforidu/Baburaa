@@ -3,8 +3,16 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 import datetime
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
+
+# Custom Validator to ensure no digits before the decimal point
+def validate_no_digits_before_decimal(value):
+    """Ensure that there are no digits before the decimal point (only decimals allowed)."""
+    if value and len(str(value).split('.')[0]) > 0:
+        raise ValidationError("Ensure that there are no digits before the decimal point.")
+    return value
 
 class PasswordResetRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -123,7 +131,7 @@ class ShegarLandForm(models.Model):
         ('River and Arteficial Lake', 'River and Arteficial Lake'),
         ('High Density Mixed Residence', 'High Density Mixed Residence')
     ]
-
+    
     # Model fields
     Kutaamagaalaa = models.CharField(max_length=50, choices=Kutaamagaalaa_choices)
     Aanaa = models.CharField(max_length=50, choices=Aanaa_choices)
@@ -145,8 +153,17 @@ class ShegarLandForm(models.Model):
     ragaittin_bahi_tae = models.ImageField(upload_to='images/', blank=True, null=True)
     Mallattoo = models.ImageField(upload_to='images/', blank=True, null=True)
     guyyaa_bahi_tae = models.DateField(blank=True, null=True)
-    bal_lafa_bahi_tae = models.DecimalField(max_digits=6, decimal_places=6, default=0.0,blank=True, null=True)
-    bal_lafa_hafe = models.DecimalField(max_digits=6, decimal_places=6, default=0.0,blank=True, null=True)
+    
+    bal_lafa_bahi_tae = models.DecimalField(
+        max_digits=8, decimal_places=6, default=0.0, blank=True, null=True,
+        validators=[validate_no_digits_before_decimal]
+    )
+
+    bal_lafa_hafe = models.DecimalField(
+        max_digits=8, decimal_places=6, default=0.0, blank=True, null=True,
+        validators=[validate_no_digits_before_decimal]
+    )
+    
     qaama_bahi_tahef = models.CharField(max_length=40, blank=True, null=True)
     tajajila_bahi_tahef = models.CharField(max_length=40, blank=True, null=True)
     kan_bahi_taasise = models.CharField(max_length=255, blank=True, null=True)
@@ -162,12 +179,11 @@ class ShegarLandForm(models.Model):
 
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def _str_(self):
         return self.Kutaamagaalaa
-    
-from django.db import models
-from django.contrib.auth.models import User
 
+
+# Model for Notifications
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     message = models.TextField()
@@ -175,4 +191,4 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)  # Track read/unread status
 
     def _str_(self):
-     return f"Notification: {self.message}" if self.user is None else f"Notification for {self.user.username}: {self.message}"
+        return f"Notification for {self.user.username}: {self.message}"

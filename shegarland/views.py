@@ -178,6 +178,15 @@ def admin_dashboard(request):
         messages.error(request, 'Access denied: Only administrators can access this page.')
         return redirect('dashboard')
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import ShegarLandForm, Notification, User
+from .forms import ShegarLandFormForm  # Ensure you have created this form class
+import json
+
 @login_required
 def submit_form(request):
     admin_only_fields = [
@@ -185,55 +194,63 @@ def submit_form(request):
         'tajajila_bahi_tahef', 'kan_bahi_taasise', 'ragaittin_bahi_tae', 
         'guyyaa_bahi_tae'
     ] 
+
     if request.method == 'POST':
         form = ShegarLandFormForm(request.POST, request.FILES, user=request.user)
-        
+
         if form.is_valid():
+            # Set user field
             form.instance.user = request.user
-            
+
             # Set admin-only fields based on user role
             if request.user.is_staff:
-                # If user is admin, set admin-only fields from form data
+                # Admins fill out admin-only fields
                 for field in admin_only_fields:
                     setattr(form.instance, field, form.cleaned_data.get(field))
             else:
-                # If user is not admin, set admin-only fields to None
+                # Non-admins should not be able to fill these fields, set them to None
                 for field in admin_only_fields:
                     setattr(form.instance, field, None)
-            
+
             form.save()
             messages.success(request, 'Your submission was successful!')
-            
-            # Notify the admin only
-            if request.user.is_staff:  # Only create notification for admin
+
+            # Notify admin users only when it's a regular user submission
+            if not request.user.is_staff:
                 admin_users = User.objects.filter(is_staff=True)
                 for admin in admin_users:
                     Notification.objects.create(
                         user=admin,
-                        message="A new submission has been received.",
+                        message=f"A new submission was received from {request.user.username}.",
                     )
             
             return redirect('dashboard')  # Redirect after submission
+
         else:
-            messages.error(request, 'There were errors in your submission. Please correct them.')
+            # Log form errors to the console for debugging
+            print(form.errors)  # Log errors in the console
+
+            # Display specific errors to the user
+            for field, error_messages in form.errors.items():
+                for message in error_messages:
+                    messages.error(request, f"Error in {field}: {message}")
+
     else:
         form = ShegarLandFormForm(user=request.user)
 
     return render(request, 'shegarland/form.html', {'form': form, 'admin_only_fields': admin_only_fields})
-# Handle map drawing saving via GeoJSON
+
 @csrf_exempt
 def save_drawing(request):
     if request.method == 'POST':
         try:
             geojson_data = json.loads(request.body.decode('utf-8'))
-            # You can process the geojson_data as needed here
+            # Process the geojson_data here as needed
             return JsonResponse({'status': 'success'}, status=200)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
     return JsonResponse({'status': 'invalid request'}, status=400)
-
-# Password reset request creation
 
 @login_required
 def create_password_reset_request(request):
