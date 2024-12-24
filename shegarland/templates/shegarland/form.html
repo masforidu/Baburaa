@@ -11,6 +11,7 @@
 </nav>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-geometryutil"></script>
     
     <style>
         body {
@@ -194,6 +195,20 @@
             }
         });
         map.addControl(drawControl);
+   // Save to localStorage
+    function saveToLocalStorage() {
+        var data = drawnItems.toGeoJSON();
+        localStorage.setItem('drawnItems', JSON.stringify(data));
+    }
+
+    map.on('draw:created', function(e) {
+        var layer = e.layer;
+        drawnItems.addLayer(layer);
+        saveToLocalStorage();
+    });
+
+    map.on('draw:edited', saveToLocalStorage);
+    map.on('draw:deleted', saveToLocalStorage);
 
         // Event listener for shape creation
         map.on('draw:created', function (e) {
@@ -243,7 +258,36 @@
                 alert('Geolocation is not supported by this browser.');
             }
         });
-
+        map.on('draw:created', function (e) {
+            var layer = e.layer;
+        
+            // Add the layer to the drawn items feature group
+            drawnItems.addLayer(layer);
+        
+            // Check if the drawn shape is a polygon
+            if (layer instanceof L.Polygon) {
+                // Get the coordinates of the polygon
+                var latlngs = layer.getLatLngs()[0];
+        
+                // Calculate the area (in square meters)
+                var area = L.GeometryUtil.geodesicArea(latlngs);
+        
+                // Calculate the perimeter (sum of distances between points)
+                var perimeter = 0;
+                for (var i = 0; i < latlngs.length - 1; i++) {
+                    perimeter += latlngs[i].distanceTo(latlngs[i + 1]);
+                }
+                perimeter += latlngs[latlngs.length - 1].distanceTo(latlngs[0]); // Close the polygon
+        
+                // Display area and perimeter in a popup
+                var content = `
+                    <strong>Measurements:</strong><br>
+                    Area: ${area.toFixed(2)} m²<br>
+                    Perimeter: ${perimeter.toFixed(2)} m
+                `;
+                layer.bindPopup(content).openPopup();
+            }
+        });
         // Handle KML import 
         document.getElementById('import-kml').onclick = function() {
             var fileInput = document.getElementById('kml-file');
