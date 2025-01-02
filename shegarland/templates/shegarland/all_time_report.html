@@ -5,22 +5,22 @@
 {% block content %}
 <a href="{% url 'export_report_csv' %}" class="btn btn-primary">CSVtti naa jijjiri</a>
 
-<h1>All-Time Report Bankii Lafaa</h1>
+<h1>Gabaasaa Baankii lafaa hangaa ammatti jiru</h1>
 
 <!-- Dropdown for Report Types -->
 <div class="dropdown mb-3">
     <button class="btn btn-secondary dropdown-toggle" type="button" id="reportDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Select Report Type
+        Gabaasaalee
     </button>
     <div class="dropdown-menu" aria-labelledby="reportDropdown">
-        <a class="dropdown-item" href="{% url 'weekly_report' %}">Weekly Report</a>
-        <a class="dropdown-item" href="{% url 'monthly_report' %}">Monthly Report</a>
-        <a class="dropdown-item" href="{% url 'all_time_report' %}">All-Time Report</a>
+        <a class="dropdown-item" href="{% url 'weekly_report' %}">Gabaasa Torbee,</a>
+        <a class="dropdown-item" href="{% url 'monthly_report' %}">Gabaasa Ji'a</a>
+        <a class="dropdown-item" href="{% url 'all_time_report' %}">Gabaasa Hanga</a>
     </div>
 </div>
 
-<h2>All-Time Land Data</h2>
-<h3>Aggregate Table</h3>
+<h2>Ragaa Bankii lafaa hangaa</h2>
+<h3>Gabatee galmee bankii lafaa hanga</h3>
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -42,14 +42,14 @@
     </tbody>
 </table>
 
-<h3>All-Time Summary</h3>
+<h3>Cuunfaa Bal'ina lafa bahi ta'e fi hafe hanga ammatti</h3>
 <table class="table table-bordered">
     <tr><td>Ida'ama Balina Lafa hanga:</td><td>{{ all_time_total_balina_lafa }}</td></tr>
     <tr><td>Ida'ama Balina Lafa Bahi Tae hanga:</td><td>{{ all_time_bal_bahi_tae }}</td></tr>
     <tr><td>Ida'ama Balina Lafa Hafe hanag:</td><td>{{ all_time_total_lafa_hafe }}</td></tr>
 </table>
 
-<h2>Land Data Graphs</h2>
+<h2>Giraafii Bankii lafaa Kutaa magaalaan</h2>
 <canvas id="KutaamagaalaaChart"></canvas>
 <canvas id="KutaamagaalaaChartBahi"></canvas>
 <canvas id="KutaamagaalaaChartHafe"></canvas>

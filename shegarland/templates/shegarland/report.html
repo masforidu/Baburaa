@@ -1,26 +1,26 @@
 {% extends 'base.html' %}
 
-{% block title %}All-Time Report{% endblock %}
+{% block title %}Gabaasa Hanga{% endblock %}
 
 {% block content %}
 <a href="{% url 'export_report_csv' %}" class="btn btn-primary">CSVtti naa jijjiri</a>
 
-<h1>All-Time Report Bankii Lafaa</h1>
+<h1>Gabaasa Bankii Lafaa Hanga amma</h1>
 
 <!-- Dropdown for Report Types -->
 <div class="dropdown mb-3">
     <button class="btn btn-secondary dropdown-toggle" type="button" id="reportDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Select Report Type
+        Gabaasaalee
     </button>
     <div class="dropdown-menu" aria-labelledby="reportDropdown">
-        <a class="dropdown-item" href="{% url 'weekly_report' %}">Weekly Report</a>
-        <a class="dropdown-item" href="{% url 'monthly_report' %}">Monthly Report</a>
-        <a class="dropdown-item" href="{% url 'all_time_report' %}">All-Time Report</a>
+        <a class="dropdown-item" href="{% url 'weekly_report' %}">Gabaasa Torbee,</a>
+        <a class="dropdown-item" href="{% url 'monthly_report' %}">Gabaasa Ji'a,</a>
+        <a class="dropdown-item" href="{% url 'all_time_report' %}">Gabaasa Hanga</a>
     </div>
 </div>
 
-<h2>All-Time Land Data</h2>
-<h3>Aggregate Table</h3>
+<h2>Ragaa Bankii lafaa hanga</h2>
+<h3>Gabatee galmee lafa </h3>
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -42,14 +42,14 @@
     </tbody>
 </table>
 
-<h3>All-Time Summary</h3>
+<h3>Cuunfaa Gabaasaa Waligaala Lafa Bahee fi Hafee kan Hangaa</h3>
 <table class="table table-bordered">
     <tr><td>Total Balina Lafa:</td><td>{{ all_time_total_balina_lafa }}</td></tr>
     <tr><td>Total Balina Lafa Bahi Tae:</td><td>{{ all_time_bal_bahi_tae }}</td></tr>
     <tr><td>Total Balina Lafa Hafe:</td><td>{{ all_time_total_lafa_hafe }}</td></tr>
 </table>
 
-<h2>Land Data Graphs</h2>
+<h2>Girafii Ragaa bankii lafaa </h2>
 <canvas id="KutaamagaalaaChart"></canvas>
 <canvas id="KutaamagaalaaChartBahi"></canvas>
 <canvas id="KutaamagaalaaChartHafe"></canvas>

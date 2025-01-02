@@ -7,12 +7,12 @@
 <!-- Report Selection Dropdown -->
 <div class="dropdown mb-3">
     <button class="btn btn-secondary dropdown-toggle" type="button" id="reportDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Select Report Type
+        Gabaasaalee
     </button>
     <div class="dropdown-menu" aria-labelledby="reportDropdown">
-        <a class="dropdown-item" href="{% url 'weekly_report' %}">Weekly Report</a>
-        <a class="dropdown-item" href="{% url 'monthly_report' %}">Monthly Report</a>
-        <a class="dropdown-item" href="{% url 'report' %}">report</a>
+        <a class="dropdown-item" href="{% url 'weekly_report' %}">Gabaasa Torbee,</a>
+        <a class="dropdown-item" href="{% url 'monthly_report' %}">Gabaasa Ji'a,</a>
+        <a class="dropdown-item" href="{% url 'report' %}">Gabaasa Hanga</a>
     </div>
 </div>
 
@@ -55,17 +55,17 @@
  <div class="pagination" style="text-align: center; margin: 20px 0;">
     <span>
         {% if submissions.has_previous %}
-            <a href="?page={{ submissions.previous_page_number }}" class="btn btn-outline-primary">Previous</a>
+            <a href="?page={{ submissions.previous_page_number }}" class="btn btn-outline-primary">Garaa duubaatti</a>
         {% else %}
-            <button class="btn btn-outline-secondary" disabled>Previous</button>
+            <button class="btn btn-outline-secondary" disabled>Garaa duubaatti</button>
         {% endif %}
 
-        <span class="mx-3">Page {{ submissions.number }} of {{ submissions.paginator.num_pages }}</span>
+        <span class="mx-3">Fuula {{ submissions.number }} of {{ submissions.paginator.num_pages }}</span>
 
         {% if submissions.has_next %}
-            <a href="?page={{ submissions.next_page_number }}" class="btn btn-outline-primary">Next</a>
+            <a href="?page={{ submissions.next_page_number }}" class="btn btn-outline-primary">Gara fulduratti</a>
         {% else %}
-            <button class="btn btn-outline-secondary" disabled>Next</button>
+            <button class="btn btn-outline-secondary" disabled>Gara fulduratti</button>
         {% endif %}
     </span>
 </div>
@@ -95,7 +95,7 @@
 </table>
 
 <!-- Overall Summary -->
-<h2>Cuunfaa Balina Lafaa Bahee fi Jiruu</h2>
+<h2>Cuunfaa Balina Lafaa Bahee fi Hafee</h2>
 <table class="table table-bordered">
     <tr>
         <td>Ida'ama Balina Lafa:</td>

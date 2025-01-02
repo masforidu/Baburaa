@@ -107,7 +107,7 @@ class ShegarLandForm(models.Model):
         ('Galaan', 'Galaan'), ('Andoodee', 'Andoodee'), ('Mudaa Furii', 'Mudaa Furii'),
         ('Caffe karaabuu', 'Caffe karaabuu'), ('Gadaa Faajjii', 'Gadaa Faajjii'),
         ('Galaan Guddaa', 'Galaan Guddaa'), ('Lakkulee gejjaa', 'Lakkulee gejjaa'),
-        ('Daalattii', 'Daalattii'), ('Wacacaa', 'Wacacaa'),
+        ('Daalattii', 'Daalattii'), ('Meettaa', 'Meettaa'),
         ('Mogolee', 'Mogolee'), ('Caffee', 'Caffee'), ('M/gafarsaa', 'M/gafarsaa'),
         ('Nonnoo', 'Nonnoo'), ('Beeroo', 'Beeroo'), ('B/Kattaa', 'B/Kattaa'),
         ('L/kattaa', 'L/kattaa'), ('A/diimaa', 'A/diimaa'), ('G/burrayyuu', 'G/burrayyuu'),
@@ -154,16 +154,14 @@ class ShegarLandForm(models.Model):
     Mallattoo = models.ImageField(upload_to='images/', blank=True, null=True)
     guyyaa_bahi_tae = models.DateField(blank=True, null=True)
     
+    # Remove the restrictive validator from DecimalField
     bal_lafa_bahi_tae = models.DecimalField(
-        max_digits=8, decimal_places=6, default=0.0, blank=True, null=True,
-        validators=[validate_no_digits_before_decimal]
+        max_digits=8, decimal_places=6, default=0.0, blank=True, null=True
+    )
+    bal_lafa_hafe = models.DecimalField(
+        max_digits=8, decimal_places=6, default=0.0, blank=True, null=True
     )
 
-    bal_lafa_hafe = models.DecimalField(
-        max_digits=8, decimal_places=6, default=0.0, blank=True, null=True,
-        validators=[validate_no_digits_before_decimal]
-    )
-    
     qaama_bahi_tahef = models.CharField(max_length=40, blank=True, null=True)
     tajajila_bahi_tahef = models.CharField(max_length=40, blank=True, null=True)
     kan_bahi_taasise = models.CharField(max_length=255, blank=True, null=True)

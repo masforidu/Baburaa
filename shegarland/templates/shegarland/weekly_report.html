@@ -7,12 +7,12 @@
 <!-- Report Selection Dropdown -->
 <div class="dropdown mb-3">
     <button class="btn btn-secondary dropdown-toggle" type="button" id="reportDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Select Report Type
+        Gabaasaalee
     </button>
     <div class="dropdown-menu" aria-labelledby="reportDropdown">
-        <a class="dropdown-item" href="{% url 'weekly_report' %}">Weekly Report</a>
-        <a class="dropdown-item" href="{% url 'monthly_report' %}">Monthly Report</a>
-        <a class="dropdown-item" href="{% url 'report' %}">All Time Report</a>
+        <a class="dropdown-item" href="{% url 'weekly_report' %}">Gabaasa Torbee,</a>
+        <a class="dropdown-item" href="{% url 'monthly_report' %}">Gabaasa Ji'a,</a>
+        <a class="dropdown-item" href="{% url 'report' %}">Gabaasa Hanga</a>
     </div>
 </div>
 
@@ -55,24 +55,24 @@
 <div class="pagination" style="text-align: center; margin-top: 20px;">
     <span>
         {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-primary">Previous</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-primary">Garaa duubaatti</a>
         {% else %}
-            <button class="btn btn-outline-secondary" disabled>Previous</button>
+            <button class="btn btn-outline-secondary" disabled>Garaa duubaatti</button>
         {% endif %}
 
-        <span class="mx-3">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        <span class="mx-3">Fuula {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
 
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-primary">Next</a>
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-primary">Gara fulduratti</a>
         {% else %}
-            <button class="btn btn-outline-secondary" disabled>Next</button>
+            <button class="btn btn-outline-secondary" disabled>Gara fulduratti</button>
         {% endif %}
     </span>
 </div>
 
 </div>
 <!-- Summary Table for Aggregates -->
-<h2>Cuunfaa Gabaasaa Balina lafa Galii fi Bahi ta'e</h2>
+<h2>Cuunfaa Gabaasaa Balina lafa Galii fi Bahi ta'e kan torbee kana</h2>
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -97,7 +97,7 @@
 </table>
 
 <!-- Overall Summary -->
-<h2>Cuunfaa Balina Lafaa Bahee fi Jiruu</h2>
+<h2>Cuunfaa Balina Lafaa Bahee fi Hafee</h2>
 <table class="table table-bordered">
     <tr>
         <td>Ida'ama Balina Lafa torbe:</td>
@@ -118,7 +118,7 @@
 </table>
 
 <!-- Graphs using Chart.js -->
-<h2>Giraafii Bankii Lafaa Kutaamagala</h2>
+<h2>Giraafii Bankii Lafaa Kutaamagalan</h2>
 <canvas id="KutaamagaalaaChart"></canvas>
 <canvas id="KutaamagaalaaChartBahi"></canvas>
 <canvas id="KutaamagaalaaChartHafe"></canvas>
