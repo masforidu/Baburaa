@@ -12,7 +12,7 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
+            background-color:rgb(185, 199, 213);
         }
         header, footer {
             background-color: purple;
@@ -38,6 +38,7 @@
         .footer a:hover {
             color: darkblue;
         }
+        /* Hero section styles */
         .hero {
             background-color: azure;
             height: 40vh;
@@ -47,19 +48,41 @@
             color: maroon;
             text-align: center;
             position: relative;
+            overflow: hidden; /* Hide the overflow if the text moves out of view */
         }
-        .hero img {
-            width: 80px;
+
+        /* Dynamic movement for the text */
+        .hero .moving-text {
             position: absolute;
-            top: 10%;
+            top: 50%;
+            left: -100%; /* Start from the left side of the screen */
             transform: translateY(-50%);
+            font-size: 4rem;
+            white-space: nowrap;
+            animation: moveText 15s linear infinite; /* Slow down the movement */
         }
-        .hero img.oro-log {
-            left: 0px;
+
+        @keyframes moveText {
+            0% {
+                left: -100%; /* Start from the left side */
+            }
+            25% {
+                left: 10%; /* Slightly towards the right */
+                transform: translateX(-10%) translateY(-50%);
+            }
+            50% {
+                left: 40%; /* Centered position */
+                transform: translateX(-50%) translateY(-50%);
+            }
+            75% {
+                left: 70%; /* Further towards the right */
+                transform: translateX(-50%) translateY(-50%);
+            }
+            100% {
+                left: 100%; /* End at the right side */
+            }
         }
-        .hero img.shegarlog {
-            right: 0px;
-        }
+
         main.container {
             background-color: gray;
             color: indigo;
@@ -92,12 +115,127 @@
     <header>
         <div class="hero">
             <div>
-                <h1>W/ra Lafaa Magaala Shaggar, Daarektoreetii Q/B/E/Lafaa</h1>
-                <h1>'Welcome to Shegar Land Office, Land Prep. and Bank Director'</h1>
-                <p>Ergamni Keenya Sirna bulchiinsaa fi itti fayyadama lafaa wayitawwaa ta’e dirirsuun, Misooma Lafa irrattii gaggeeffamu karaa Itti fufinsaan qabuun hogganuun, fayyadamummaa hawwaasa Magaalichaa mirkaneessuu.</p>
+                <!-- Moving Texts -->
+                <h1 class="moving-text text1">W/ra Lafaa Magaala Shaggar, Daarektoreetii Q/B/E/Lafaa</h1>
+                <h1 class="moving-text text2">'Welcome to Shegar Land Office, Land Prep. and Bank Director'</h1>
+                <!-- Animated Paragraph -->
+                <p class="moving-paragraph">Ergamni Keenya Sirna bulchiinsaa fi itti fayyadama lafaa wayitawwaa ta’e dirirsuun, Misooma Lafa irrattii gaggeeffamu karaa Itti fufinsaan qabuun hogganuun, fayyadamummaa hawwaasa Magaalichaa mirkaneessuu.</p>
             </div>
+        
+            <!-- Moving Images -->
+            <img class="moving-image-left" src="{% static 'shegarland/images/shegarlog.png' %}" alt="Left Logo">
+            <img class="moving-image-right" src="{% static 'shegarland/images/orolog.png' %}" alt="Right Logo">
         </div>
-
+        
+        <style>
+            .hero {
+                background-color: azure;
+                height: 50vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                color: maroon;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+        
+            /* Moving Text Animations */
+            .hero .moving-text {
+                position: absolute;
+                top: 20%;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 2rem;
+                white-space: nowrap;
+                opacity: 0;
+                animation: fadeInOut 10s linear infinite;
+            }
+        
+            .hero .text1 {
+                animation-delay: 0s;
+            }
+        
+            .hero .text2 {
+                animation-delay: 5s;
+            }
+        
+            /* Paragraph Animation */
+            .hero .moving-paragraph {
+                position: absolute;
+                top: 40%; /* Below the two texts */
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 1rem;
+                color: darkblue;
+                opacity: 0;
+                animation: fadeInOutParagraph 10s linear infinite;
+                animation-delay: 10s; /* Starts after text2 finishes */
+            }
+        
+            @keyframes fadeInOut {
+                0%, 100% {
+                    opacity: 0;
+                }
+                10%, 40% {
+                    opacity: 1;
+                }
+            }
+        
+            @keyframes fadeInOutParagraph {
+                0%, 100% {
+                    opacity: 0;
+                }
+                10%, 40% {
+                    opacity: 1;
+                }
+            }
+        
+            /* Left Image Animation */
+            .moving-image-left {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 70px;
+                height: 50px;
+                animation: moveHorizontally 5s linear infinite;
+            }
+        
+            /* Right Image Animation */
+            .moving-image-right {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 70px;
+                height: 50px;
+                animation: moveHorizontallyReverse 5s linear infinite;
+            }
+        
+            @keyframes moveHorizontally {
+                0% {
+                    transform: translateX(0); /* Start position */
+                }
+                50% {
+                    transform: translateX(100%); /* Move to the right */
+                }
+                100% {
+                    transform: translateX(0); /* Return to start */
+                }
+            }
+        
+            @keyframes moveHorizontallyReverse {
+                0% {
+                    transform: translateX(0); /* Start position */
+                }
+                50% {
+                    transform: translateX(-100%); /* Move to the left */
+                }
+                100% {
+                    transform: translateX(0); /* Return to start */
+                }
+            }
+        </style>
         <nav class="navbar navbar-expand-lg navbar-dark">
             <a class="navbar-brand" href="{% url 'home' %}">Baafata/Home/</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -154,7 +292,7 @@
                         if (badge.length) {
                             badge.text(data.unread_count); // Update existing badge
                         } else {
-                            $('.notification-bell').append(<span class="badge">${data.unread_count}</span>); // Add badge
+                            $('.notification-bell').append('<span class="badge">' + data.unread_count + '</span>'); // Add badge
                         }
                     } else {
                         badge.remove(); // Remove badge if no unread notifications
