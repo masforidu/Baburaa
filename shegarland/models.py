@@ -143,7 +143,7 @@ class ShegarLandForm(models.Model):
     haala_beenya = models.CharField(max_length=20, choices=haala_beenya_choices)
     qamaa_qophaef = models.CharField(max_length=50, blank=True, null=True)
     tajajila_qophaef = models.CharField(max_length=50, choices=tajajila_qophaef_choices)
-    balina_lafa = models.DecimalField(max_digits=6, decimal_places=6, default=0.0)
+    balina_lafa = models.DecimalField(max_digits=10, decimal_places=2)
     kan_qophesse = models.CharField(max_length=40, default='user', blank=True, null=True)
     guyya_qophae = models.DateField()
     guyya_galmae = models.DateField(null=True, blank=True, default=datetime.date.today)
