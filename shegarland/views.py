@@ -654,3 +654,27 @@ def mark_as_unread(request, notification_id):
 def unread_notifications_count_view(request):
     unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
     return JsonResponse({'unread_count': unread_count})
+
+from django.http import JsonResponse
+
+def geojson_data(request):
+    data = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [40.5, 9.15]
+                },
+                "properties": {"popupContent": "Dynamically Loaded Marker"}
+            }
+        ]
+    }
+    return JsonResponse(data)
+
+from django.shortcuts import render
+
+def map_view(request):
+    return render(request, 'shegarland/map.html')
+

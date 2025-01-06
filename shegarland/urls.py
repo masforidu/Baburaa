@@ -32,7 +32,8 @@ from .views import (
     notifications_view,
     mark_as_read,
     mark_as_unread,
-    unread_notifications_count_view  # Add this import
+    unread_notifications_count_view,
+    map_view, # Added this import
 )
 
 urlpatterns = [
@@ -41,6 +42,7 @@ urlpatterns = [
     path('about/', about, name='about'),
     path('privacy-policy/', privacy_policy, name='privacy_policy'),
     path('terms-of-service/', terms_of_service, name='terms_of_service'),
+
 
     # User Authentication
     path('register/', register, name='register'),
@@ -70,6 +72,8 @@ urlpatterns = [
     path('admin/report/weekly/', staff_member_required(weekly_report), name='weekly_report'),
     path('admin/report/monthly/', staff_member_required(monthly_report), name='monthly_report'),
     path('admin/export/report/csv/', export_report_csv, name='export_report_csv'),
+    path('map/', map_view, name='map_view'),
+
 
     # Submission Management
     path('submission/edit/<int:submission_id>/', edit_submission, name='edit_submission'),
@@ -81,6 +85,7 @@ urlpatterns = [
     path('notification/read/<int:notification_id>/', mark_as_read, name='mark_as_read'),
     path('notification/unread/<int:notification_id>/', mark_as_unread, name='mark_as_unread'),
 
-    # Add the unread notifications count endpoint
+    # Unread Notifications Count
     path('notifications/unread_count/', unread_notifications_count_view, name='unread_notifications_count'),
+
 ]

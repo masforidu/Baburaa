@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Standalone Map{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+            margin: 20px 0;
+        }
+        .coordinates-input {
+            margin: 10px 0;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+    <header style="text-align: center; background-color: #007bff; color: white; padding: 10px;">
+        <h1>Tajajilaa Mappii</h1>
+    </header>
+
+    <!-- Coordinate Input Section -->
+    <div class="coordinates-input">
+        <label for="easting">X koordinetii:</label>
+        <input type="number" id="easting" placeholder="Enter UTM Easting" />
+        <label for="northing">Y koordinetii:</label>
+        <input type="number" id="northing" placeholder="Enter UTM Northing" />
+        <button id="go-to-coordinates">Bakka koordineti demi</button>
+    </div>
+
+    <!-- Live Location Button -->
+    <button id="find-location">Location kiyya</button>
+
+    <!-- KML Upload -->
+    <input type="file" id="kml-file" accept=".kml" />
+    <button id="import-kml">KML fidi</button>
+
+    <!-- Export Button -->
+    <button id="export-geojson">Shapefile busi</button>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+    <script src="https://unpkg.com/leaflet-omnivore@latest/leaflet-omnivore.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/proj4"></script>
+
+    <script>
+        // Initialize map
+        var map = L.map('map').setView([0, 0], 2); // Default view
+        L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}&key=AIzaSyA8rBeGfJPkPAQwdSuo7YYuW1d2gqks_TA', {
+            maxZoom: 20,
+        }).addTo(map);
+
+        // Feature group for drawn items
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
+        // Leaflet Draw Controls
+        var drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: drawnItems
+            },
+            draw: {
+                polygon: true,
+                polyline: true,
+                rectangle: true,
+                circle: true,
+                marker: true,
+            }
+        });
+        map.addControl(drawControl);
+
+        // Save drawn shapes to localStorage
+        function saveToLocalStorage() {
+            var data = drawnItems.toGeoJSON();
+            localStorage.setItem('drawnItems', JSON.stringify(data));
+        }
+
+        map.on('draw:created', function(e) {
+            var layer = e.layer;
+            drawnItems.addLayer(layer);
+            saveToLocalStorage();
+        });
+
+        map.on('draw:edited', saveToLocalStorage);
+        map.on('draw:deleted', saveToLocalStorage);
+
+        // Handle UTM Coordinate Input
+        document.getElementById('go-to-coordinates').addEventListener('click', function() {
+            var easting = parseFloat(document.getElementById('easting').value);
+            var northing = parseFloat(document.getElementById('northing').value);
+
+            if (easting && northing) {
+                var latLng = proj4('EPSG:32637', 'EPSG:4326', [easting, northing]);
+                map.setView([latLng[1], latLng[0]], 14);
+                L.marker([latLng[1], latLng[0]]).addTo(map)
+                    .bindPopup("UTM Coordinates:<br>Easting: " + easting + "<br>Northing: " + northing)
+                    .openPopup();
+            } else {
+                alert('Please enter valid UTM coordinates.');
+            }
+        });
+
+        // Handle Live Location
+        document.getElementById('find-location').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    map.setView([lat, lng], 14);
+                    L.marker([lat, lng]).addTo(map).bindPopup("You are here!").openPopup();
+                }, function() {
+                    alert('Could not get your location.');
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        });
+        map.on('draw:created', function (e) {
+          var layer = e.layer;
+      
+          // Add the layer to the drawn items feature group
+          drawnItems.addLayer(layer);
+      
+          // Check if the drawn shape is a polygon
+          if (layer instanceof L.Polygon) {
+              // Get the coordinates of the polygon
+              var latlngs = layer.getLatLngs()[0];
+      
+              // Calculate the area (in square meters)
+              var area = L.GeometryUtil.geodesicArea(latlngs);
+      
+              // Calculate the perimeter (sum of distances between points)
+              var perimeter = 0;
+              for (var i = 0; i < latlngs.length - 1; i++) {
+                  perimeter += latlngs[i].distanceTo(latlngs[i + 1]);
+              }
+              perimeter += latlngs[latlngs.length - 1].distanceTo(latlngs[0]); // Close the polygon
+      
+              // Display area and perimeter in a popup
+              var content = `
+                  <strong>Safarrii:</strong><br>
+                  Bal'ina: ${area.toFixed(2)} m²<br>
+                  Dherina: ${perimeter.toFixed(2)} m
+              `;
+              layer.bindPopup(content).openPopup();
+          }
+      });
+        // Handle KML Import
+        document.getElementById('import-kml').onclick = function() {
+            var fileInput = document.getElementById('kml-file');
+            if (fileInput.files.length > 0) {
+                var file = fileInput.files[0];
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var kmlText = e.target.result;
+                    try {
+                        var kmlLayer = omnivore.kml.parse(kmlText);
+                        kmlLayer.addTo(map);
+                        map.fitBounds(kmlLayer.getBounds());
+                    } catch (error) {
+                        alert("Invalid KML file.");
+                    }
+                };
+                reader.readAsText(file);
+            } else {
+                alert("Please select a KML file.");
+            }
+        };
+
+        // Handle GeoJSON Export
+        document.getElementById('export-geojson').onclick = function() {
+            var geojson = drawnItems.toGeoJSON();
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geojson));
+            var a = document.createElement('a');
+            a.setAttribute("href", dataStr);
+            a.setAttribute("download", "drawings.geojson");
+            a.click();
+        };
+    </script>
+{% endblock %}
