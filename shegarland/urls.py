@@ -33,7 +33,7 @@ from .views import (
     mark_as_read,
     mark_as_unread,
     unread_notifications_count_view,
-    map_view, # Added this import
+    map_view,# Added this import
 )
 
 urlpatterns = [

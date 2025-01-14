@@ -1,12 +1,54 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Home | Shegarland{% endblock %}
 
 {% block content %}
 <div class="content-wrapper">
     <h1>BAGA NAGAAN DHUFTAAN!</h1>
     <h1>Welcome to Shegarland!</h1>
-    <p>Kun Fuulaa Seensaa Websayitii W/ra Lafaa M/shaggar Daarektoretii Q/B/E/Lafaa ti.Fuulaa ittii Aanuu Argachuuf Linkiwwaan armaan Olii tuqaa.</p>
+    <p>Kun Fuulaa Seensaa Websayitii W/ra Lafaa M/shaggar Daarektoretii Q/B/E/Lafaa ti. Fuulaa ittii Aanuu Argachuuf Linkiwwaan armaan Olii tuqaa.</p>
     <p>This is the homepage. Use the navigation links to explore.</p>
+
+    <!-- Row for images and text -->
+    <div class="row justify-content-center">
+        <!-- First Image with Text -->
+        <div class="col-md-6 text-center">
+            <div style="box-shadow: 0px 0px 10px rgba(62, 86, 105, 0.2);" class="p-6">
+                <img src="{% static 'shegarland/images/shegview2.jpg' %}" alt="" style="width: 850px; height: 400px; object-fit: cover;">
+                <div style="margin-top: 10px;">
+                    <p><strong>SHEGAR MAGAALAA EGEREE</strong></p>
+                    <p>Shegar The Future City</p>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <!-- First Image with Text -->
+            <div class="col-md-6 text-center">
+                <div style="box-shadow: 0px 0px 10px rgba(62, 86, 105, 0.2);" class="p-6">
+                    <img src="{% static 'shegarland/images/SDP map.png' %}" alt="" style="width: 850px; height: 700px; object-fit: cover;">
+                    <div style="margin-top: 20px;">
+                        <p><strong>Land Administration for sustainable prosperity</strong></p>
+                    </div>
+                </div>
+            </div>
+        <!-- Second Image with Text -->
+        <div class="col-md-6 text-center">
+            <div style="box-shadow: 0px 0px 10px rgba(62, 86, 105, 0.2);" class="p-6">
+                <img src="{% static 'shegarland/images/shegview.jpg' %}" alt=""  style="width: 850px; height: 400px; object-fit: cover;">
+                <div style="margin-top: 10px;">
+                    <p><strong>SHEGAR MAGAALAA EGEREE</strong></p>
+                    <p>Shegar The Future City</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 text-center">
+            <div style="box-shadow: 0px 0px 10px rgba(62, 86, 105, 0.2);" class="p-6">
+                <img src="{% static 'shegarland/images/shegarmap.jpg' %}" alt=""  style="width: 850px; height: 600px; object-fit: cover;">
+                <div style="margin-top: 10px;">
+                    <p><strong>Land Administration for sustainable prosperity</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -84,7 +84,7 @@
         }
 
         main.container {
-            background-color: gray;
+            background-color: #F5F5F5;
             color: indigo;
             padding: 60px;
             border-radius: 10px;
@@ -235,41 +235,59 @@
                     transform: translateX(0); /* Return to start */
                 }
             }
+            
+        <<style>
+            .navbar {
+                background-color: #343a40; /* Dark background for the navbar */
+            }
+            .navbar-toggler-icon {
+                background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%288, 8, 8, 0.5%29' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+            }
+            .navbar-dark .nav-link {
+                color: #fff;
+            }
+            .navbar-dark .nav-link:hover {
+                color: #ffc107;
+            }
         </style>
-        <nav class="navbar navbar-expand-lg navbar-dark">
-            <a class="navbar-brand" href="{% url 'home' %}">Baafata/Home/</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Galma'uuf/Sign Up/</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Seenuuf/Sign in/</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'map_view' %}">Standalone Map</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Ragaa Bankii Lafaa/Dashboard/</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'submit_form' %}">Fuulaa Galmee qophii fi Baankii lafaa/Land registration Form/</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}">Gabatee baankii lafaa waligalaa/Admin Dashboard/</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'report' %}">Gabaasaa/Report/</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Odeffannoo/About/</a></li>
-
-                    <!-- Notification Icon -->
-                    <li class="nav-item">
-                        <a class="nav-link notification-bell" href="{% url 'notifications' %}">
-                            <i class="fas fa-bell"></i>
-                            {% if unread_notifications_count > 0 %}
-                                <span class="badge">{{ unread_notifications_count }}</span>
-                            {% endif %}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </header>
-
-    <main class="container mt-5">
-        {% block content %}
-        {% endblock %}
-    </main>
+        
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <a class="navbar-brand" href="{% url 'home' %}">Baafata/Home/</a>
+                <!-- Toggler for collapsing the navbar -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <!-- Collapsible Menu -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Galma'uuf/Sign Up/</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Seenuuf/Sign in/</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'map_view' %}">Standalone Map</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Ragaa Bankii Lafaa/Dashboard/</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'submit_form' %}">Fuulaa Galmee qophii fi Baankii lafaa/Land Registration Form/</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}">Gabatee Baankii Lafaa Waligalaa/Admin Dashboard/</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'report' %}">Gabaasaa/Report/</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Odeffannoo/About/</a></li>
+        
+                        <!-- Notification Icon -->
+                        <li class="nav-item">
+                            <a class="nav-link notification-bell" href="{% url 'notifications' %}">
+                                <i class="fas fa-bell"></i>
+                                {% if unread_notifications_count > 0 %}
+                                    <span class="badge">{{ unread_notifications_count }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        
+        <main class="container mt-5">
+            {% block content %}
+            {% endblock %}
+        </main>
 
     <footer class="footer mt-8">
         <p>© 2024 Redwan Sultan. All rights reserved | 
