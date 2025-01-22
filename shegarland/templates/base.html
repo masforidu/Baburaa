@@ -12,14 +12,14 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color:rgb(185, 199, 213);
+            background-color:rgb(210, 250, 111);
         }
         header, footer {
-            background-color: purple;
-            color: blue;
+            background-color:rgb(81, 102, 240);  
+            color: white;
         }
         .navbar {
-            background-color: silver;
+            background-color:rgb(71, 123, 138); 
         }
         .navbar-brand, .nav-link {
             color: blue !important;
@@ -28,7 +28,7 @@
             color: darkblue !important;
         }
         .footer {
-            color: blue;
+            color: maroon;
             padding: 5px 0;
             text-align: center;
         }
@@ -39,18 +39,19 @@
             color: darkblue;
         }
         /* Hero section styles */
-        .hero {
-            background-color: azure;
-            height: 40vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: maroon;
-            text-align: center;
-            position: relative;
-            overflow: hidden; /* Hide the overflow if the text moves out of view */
-        }
-
+        <style>
+            .hero {
+                background-color: rgb(154, 143, 153);
+                height: 10vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                color: maroon;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
         /* Dynamic movement for the text */
         .hero .moving-text {
             position: absolute;
@@ -84,7 +85,7 @@
         }
 
         main.container {
-            background-color: #F5F5F5;
+            background-color:rgb(229, 243, 242);
             color: indigo;
             padding: 60px;
             border-radius: 10px;
@@ -129,8 +130,8 @@
         
         <style>
             .hero {
-                background-color: azure;
-                height: 50vh;
+                background-color:rgba(192, 207, 207, 0.84); 
+                height: 30vh;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -144,11 +145,11 @@
             /* Moving Text Animations */
             .hero .moving-text {
                 position: absolute;
-                top: 20%;
+                top: -10%;
                 left: 50%;
                 transform: translateX(-50%);
                 font-size: 2rem;
-                white-space: nowrap;
+                white-space: wrap;
                 opacity: 0;
                 animation: fadeInOut 10s linear infinite;
             }
@@ -197,8 +198,8 @@
                 position: absolute;
                 top: 0;
                 left: 0;
-                width: 70px;
-                height: 50px;
+                width: 100px;
+                height: 80px;
                 animation: moveHorizontally 5s linear infinite;
             }
         
@@ -207,8 +208,8 @@
                 position: absolute;
                 top: 0;
                 right: 0;
-                width: 70px;
-                height: 50px;
+                width: 100px;
+                height: 80px;
                 animation: moveHorizontallyReverse 5s linear infinite;
             }
         
@@ -241,7 +242,7 @@
                 background-color: #343a40; /* Dark background for the navbar */
             }
             .navbar-toggler-icon {
-                background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%288, 8, 8, 0.5%29' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+                background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%288, 8, 8, 0.5%29' stroke-width='4' d='M6 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
             }
             .navbar-dark .nav-link {
                 color: #fff;
@@ -249,48 +250,74 @@
             .navbar-dark .nav-link:hover {
                 color: #ffc107;
             }
+            #customDropdown {
+                display: none; /* Initially hidden */
+                position: absolute; /* Positioned below the icon */
+                top: 135px; /* Adjust this to align it below the icon */
+                left: 0px; /* Adjust to align horizontally */
+                z-index: 200; /* Ensure it appears above other elements */
+                background-color:rgb(56, 57, 44); /* Dropdown background */
+                border-radius: 0px;
+                list-style: none;
+                padding: 0px 0; /* Add padding for better spacing */
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            
+            #customDropdown a {
+                color: white;
+                text-decoration: none;
+                padding: 3px 8px;
+                display: block;
+            }
+            
+            #customDropdown a:hover {
+                background-color:rgba(17, 166, 7, 0.84);
+                color:rgb(30, 5, 155);
+            }
         </style>
+     <!-- Dropdown Toggle Icon -->
+     <p/>Click on dropdown toggle icon below to explore the navigation menu</p>
+   <i class="fas fa-bars" id="dropdownToggle" style="cursor: pointer;"></i>
+<!-- Dropdown Menu -->
+<ul id="customDropdown" class="dropdown-menu">
+    <li><a href="{% url 'home' %}">Baafata/Home/</a></li>
+    <li><a href="{% url 'register' %}">Galma'uuf/Sign Up</a></li>
+    <li><a href="{% url 'login' %}">Seenuuf/Sign In</a></li>
+    <li><a href="{% url 'map_view' %}">Map page</a></li>
+    <li><a href="{% url 'dashboard' %}">Ragaa Bankii Lafaa/Dashboard</a></li>
+        <!-- Dropdown Menu -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Services / Tajaajiloota
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                <li><a class="dropdown-item" href="{% url 'submit_form' %}">Galmee qophii fi bankii/Forms</a></li>
+                <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">Ragaa bankii waligalaa/Admin dashboard</a></li>
+                <li><a class="dropdown-item" href="{% url 'report' %}">Gabaasaa/Report</a></li>. 
+            </ul>
+        </li>
+    <li><a href="{% url 'about' %}">Odeffannoo/About</a></li>
+</ul>
+    </nav>
+        <!-- Notification Icon -->
+        <li class="nav-item">
+            <a class="nav-link notification-bell" href="{% url 'notifications' %}">
+                <i class="fas fa-bell"></i>
+                {% if unread_notifications_count > 0 %}
+                    <span class="badge">{{ unread_notifications_count }}</span>
+                {% endif %}
+            </a>
+        </li>
+    </ul>
+</div>
         
-        <header>
-            <nav class="navbar navbar-expand-lg navbar-dark">
-                <a class="navbar-brand" href="{% url 'home' %}">Baafata/Home/</a>
-                <!-- Toggler for collapsing the navbar -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <!-- Collapsible Menu -->
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Galma'uuf/Sign Up/</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Seenuuf/Sign in/</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'map_view' %}">Standalone Map</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Ragaa Bankii Lafaa/Dashboard/</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'submit_form' %}">Fuulaa Galmee qophii fi Baankii lafaa/Land Registration Form/</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}">Gabatee Baankii Lafaa Waligalaa/Admin Dashboard/</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'report' %}">Gabaasaa/Report/</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Odeffannoo/About/</a></li>
-        
-                        <!-- Notification Icon -->
-                        <li class="nav-item">
-                            <a class="nav-link notification-bell" href="{% url 'notifications' %}">
-                                <i class="fas fa-bell"></i>
-                                {% if unread_notifications_count > 0 %}
-                                    <span class="badge">{{ unread_notifications_count }}</span>
-                                {% endif %}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </header>
-        
-        <main class="container mt-5">
+        <main class="container mt-8">
             {% block content %}
             {% endblock %}
         </main>
 
-    <footer class="footer mt-8">
-        <p>© 2024 Redwan Sultan. All rights reserved | 
+    <footer class="footer mt-12">
+        <p>© 2024 Redwan Sultan.All rights reserved |Shegar land office:Finfinne,Ethiopia.| 
            <a href="{% url 'privacy_policy' %}">Privacy Policy</a> | 
            <a href="{% url 'terms_of_service' %}">Terms of Service</a>
         </p>
@@ -325,3 +352,28 @@
     </script>
 </body>
 </html>
+<script>
+    // Select elements
+    const dropdownToggle = document.getElementById('dropdownToggle');
+    const customDropdown = document.getElementById('customDropdown');
+
+    // Toggle dropdown visibility
+    dropdownToggle.addEventListener('click', function (e) {
+        e.stopPropagation(); // Prevent event propagation
+        if (customDropdown.style.display === 'block') {
+            customDropdown.style.display = 'none';
+        } else {
+            customDropdown.style.display = 'block';
+        }
+    });
+
+    // Prevent dropdown from closing when clicking inside it
+    customDropdown.addEventListener('click', function (e) {
+        e.stopPropagation();
+    });
+
+    // Close dropdown when clicking outside
+    window.addEventListener('click', function () {
+        customDropdown.style.display = 'none';
+    });
+</script>
