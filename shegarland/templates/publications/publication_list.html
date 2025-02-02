@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="publication-container">
+    <h1 class="publication-title">Publications</h1>
+
+    {% if publications %}
+        <ul>
+            {% for publication in publications %}
+                <li class="publication-card">
+                    <h3 class="publication-heading">{{ publication.title }}</h3>
+                    <p class="publication-date">{{ publication.published_date }}</p>
+                    <p class="publication-description">{{ publication.description }}</p>
+                    <a href="{% url 'publication_detail' publication.pk %}" class="publication-detail">View Details</a>
+                    <a href="{% url 'download_publication' publication.pk %}" class="publication-download">Download</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-publications">No publications available.</p>
+    {% endif %}
+</div>
+{% endblock %}

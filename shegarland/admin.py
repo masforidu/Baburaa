@@ -69,3 +69,10 @@ class ShegarLandFormAdmin(admin.ModelAdmin):
 
 # Register the model
 admin.site.register(ShegarLandForm, ShegarLandFormAdmin)
+
+
+from .models import Publication
+
+@admin.register(Publication)
+class PublicationAdmin(admin.ModelAdmin):
+    list_display = ('title', 'uploaded_at')

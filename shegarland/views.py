@@ -675,6 +675,44 @@ def geojson_data(request):
 
 from django.shortcuts import render
 
+@login_required
 def map_view(request):
     return render(request, 'shegarland/map.html')
 
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import FileResponse
+from .models import Publication
+from .forms import PublicationForm
+from django.shortcuts import render, get_object_or_404, redirect
+
+# Check if user is an admin
+def is_admin(user):
+    return user.is_staff
+
+# Admin-only upload view
+@login_required
+@user_passes_test(is_admin)
+def upload_publication(request):
+    if request.method == 'POST':
+        form = PublicationForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('publication_list')
+    else:
+        form = PublicationForm()
+    return render(request, 'publications/upload.html', {'form': form})
+
+# Serve PDF file for download
+def download_publication(request, pk):
+    """Allow users to download a publication file"""
+    publication = get_object_or_404(Publication, pk=pk)
+    return FileResponse(open(publication.pdf_file.path, 'rb'), as_attachment=True)
+
+def publication_list(request):
+    publications = Publication.objects.all().order_by('-created_at')
+    print(publications)  # Debugging: Check if publications exist
+    return render(request, 'publications/publication_list.html', {'publications': publications})
+
+def publication_detail(request, pk):
+    publication = get_object_or_404(Publication, pk=pk)
+    return render(request, 'publications/publication_detail.html', {'publication': publication})

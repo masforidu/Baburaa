@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="publication-container">
+    <h1 class="publication-title">{{ publication.title }}</h1>
+    <p class="publication-date">{{ publication.published_date }}</p>
+    <p class="publication-description">{{ publication.description }}</p>
+
+    <a href="{% url 'download_publication' publication.pk %}" class="publication-download">Download PDF</a>
+</div>
+{% endblock %}

@@ -60,3 +60,10 @@ class ShegarLandFormForm(forms.ModelForm):
         if Ragaa_biroo is None:  # If no file is uploaded
             return None  # Return None instead of raising an error
         return Ragaa_biroo  # Return the uploaded file if it exists
+from django import forms
+from .models import Publication
+
+class PublicationForm(forms.ModelForm):
+    class Meta:
+        model = Publication
+        fields = ['title', 'description', 'pdf_file']

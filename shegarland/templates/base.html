@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -276,7 +277,6 @@
             }
         </style>
      <!-- Dropdown Toggle Icon -->
-     <p/>Click on dropdown toggle icon below to explore the navigation menu</p>
    <i class="fas fa-bars" id="dropdownToggle" style="cursor: pointer;"></i>
 <!-- Dropdown Menu -->
 <ul id="customDropdown" class="dropdown-menu">
@@ -285,16 +285,29 @@
     <li><a href="{% url 'login' %}">Seenuuf/Sign In</a></li>
     <li><a href="{% url 'map_view' %}">Map page</a></li>
     <li><a href="{% url 'dashboard' %}">Ragaa Bankii Lafaa/Dashboard</a></li>
-        <!-- Dropdown Menu -->
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Services / Tajaajiloota
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
-                <li><a class="dropdown-item" href="{% url 'submit_form' %}">Galmee qophii fi bankii/Forms</a></li>
-                <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">Ragaa bankii waligalaa/Admin dashboard</a></li>
-                <li><a class="dropdown-item" href="{% url 'report' %}">Gabaasaa/Report</a></li>. 
-            </ul>
+       <!-- Services Dropdown -->
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Services / Tajaajiloota
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+        <li><a class="dropdown-item" href="{% url 'submit_form' %}">Galmee qophii fi bankii/Forms</a></li>
+        <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">Ragaa bankii waligalaa/Admin dashboard</a></li>
+        <li><a class="dropdown-item" href="{% url 'report' %}">Gabaasaa/Report</a></li>
+
+        <!-- Publication Section Inside the Dropdown -->
+        <li>
+            <a class="dropdown-item disabled" href="#">Publications</a>
+        </li>
+        {% for publication in publications %}
+        <li>
+            <a class="dropdown-item" href="{% url 'publication_list' %}">Publications</a>
+        </li>
+        {% empty %}
+        <li><a class="dropdown-item disabled" href="#">No publications available</a></li>
+        {% endfor %}
+    </ul>
+</li>
         </li>
     <li><a href="{% url 'about' %}">Odeffannoo/About</a></li>
 </ul>

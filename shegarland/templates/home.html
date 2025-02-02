@@ -3,11 +3,19 @@
 {% block title %}Home | Shegarland{% endblock %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<button id="login-button" class="btn btn-outline-success ml-2" onclick="location.href='{% url 'login' %}'">
+    <i class="bi bi-box-arrow-in-right"></i> Seenuuf 'Login'
+</button>
+
+<button id="logout-button" class="btn btn-outline-danger ml-2" onclick="location.href='{% url 'logout' %}'">
+    <i class="bi bi-box-arrow-left"></i> Bahuuf 'Logout'
+</button>
 <div class="content-wrapper">
     <h1>BAGA NAGAAN DHUFTAAN!</h1>
     <h1>Welcome to Shegarland!</h1>
     <p>Kun Fuulaa Seensaa Websayitii W/ra Lafaa M/shaggar Daarektoretii Q/B/E/Lafaa ti. Fuulaa ittii Aanuu Argachuuf Linkiwwaan armaan Olii tuqaa.</p>
-    <p>This is the homepage. Use the navigation links to explore.</p>
+    <p>This is the homepage. Toggle icon obove to Explore </p>
 
     <!-- Row for images and text -->
     <div class="row justify-content-center">

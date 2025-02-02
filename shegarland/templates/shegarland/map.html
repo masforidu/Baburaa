@@ -7,6 +7,7 @@
 {% block content %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css" />
+    
     <style>
         #map {
             height: 600px;
@@ -16,7 +17,7 @@
         .coordinates-input {
             margin: 10px 0;
         }
-        button {
+        button, select {
             margin: 5px;
             padding: 10px 15px;
             background-color: #007bff;
@@ -25,14 +26,13 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        button:hover {
+        button:hover, select:hover {
             background-color: #0056b3;
         }
     </style>
 
-    <header style="text-align: center; background-color: #007bff; color: white; padding: 10px;">
-    </h1>Fuulaa Kartaa </h1>
-    </h1> 'Map page'</h1>
+    <header style="text-align: center; background-color:rgb(71, 206, 247); color: white; padding: 5px;">
+        <h2>Fuulaa Kartaa 'Map page'</h2>
     </header>
 
     <!-- Coordinate Input Section -->
@@ -41,18 +41,23 @@
         <input type="number" id="easting" placeholder="Enter UTM Easting" />
         <label for="northing">Y koordinetii:</label>
         <input type="number" id="northing" placeholder="Enter UTM Northing" />
-        <button id="go-to-coordinates">Bakka koordineti demi</button>
+        <button id="go-to-coordinates">Bakka koord.na gessi</button>
     </div>
 
     <!-- Live Location Button -->
-    <button id="find-location">Location kiyya</button>
+    <button id="find-location">Argama Iddo</button>
 
-    <!-- KML Upload -->
-    <input type="file" id="kml-file" accept=".kml" />
-    <button id="import-kml">KML fidi</button>
+   <!-- KML Upload -->
+<input type="file" id="kml-file" accept=".kml" />
+<button id="import-kml">Leyari kml fidii</button>
+
+<!-- KML Layer Checkbox List -->
+<div id="kml-checkboxes" style="margin-top: 10px;">
+    <h4>Leyarii fuula kartaa irratti mul'atu filadhuu:</h4>
+</div>
 
     <!-- Export Button -->
-    <button id="export-geojson">Shapefile busi</button>
+    <button id="export-geojson">Shapefile naf busi</button>
 
     <!-- Map Container -->
     <div id="map"></div>
@@ -63,16 +68,140 @@
     <script src="https://cdn.jsdelivr.net/npm/proj4"></script>
 
     <script>
-        // Initialize map
-        var map = L.map('map').setView([0, 0], 2); // Default view
-        L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}&key=AIzaSyA8rBeGfJPkPAQwdSuo7YYuW1d2gqks_TA', {
-            maxZoom: 24,
-        }).addTo(map);
+          // Initialize map
+    var map = L.map('map').setView([0, 0], 2);
+
+    // Base layers
+    var googleSatellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}&key=AIzaSyA8rBeGfJPkPAQwdSuo7YYuW1d2gqks_TA', {
+        maxZoom: 24,
+    }).addTo(map);
+
+    var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    });
+
+    // KML Layers Group
+    var kmlLayers = L.layerGroup();
+
+    // Layer Control
+    var baseMaps = {
+        "Google Satellite": googleSatellite,
+        "OpenStreetMap": osmLayer
+    };
+
+    var overlayMaps = {
+        "KML Layers": kmlLayers
+    };
+
+    L.control.layers(baseMaps, overlayMaps).addTo(map);
+
 
         // Feature group for drawn items
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
 
+// KML Layers Dictionary
+var kmlLayers = {};
+
+// Handle KML Import
+document.getElementById('import-kml').onclick = function () {
+    var fileInput = document.getElementById('kml-file');
+    if (fileInput.files.length > 0) {
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var kmlText = e.target.result;
+            try {
+                var kmlLayer = omnivore.kml.parse(kmlText);
+
+                kmlLayer.on('ready', function () {
+                    map.fitBounds(kmlLayer.getBounds());
+                });
+
+                kmlLayer.eachLayer(function (layer) {
+                    if (layer.feature && layer.feature.properties) {
+                        var popupContent = '';
+                        for (var property in layer.feature.properties) {
+                            if (layer.feature.properties.hasOwnProperty(property)) {
+                                popupContent += '<strong>' + property + ':</strong> ' + layer.feature.properties[property] + '<br>';
+                            }
+                        }
+                        layer.bindPopup(popupContent);
+                    }
+
+                   // Apply custom styles based on the feature type
+if (layer instanceof L.Polygon || layer instanceof L.Polyline) {
+    // Style polygons and polylines
+    layer.setStyle({
+        color: getRandomColor(), // Selected color for the outline
+        weight: 3,               // Line thickness
+        opacity: 5,              // Line transparency
+        fillOpacity: 0           // Fill transparency for polygons
+    });
+} else if (layer instanceof L.Marker) {
+
+                        // Custom icon for markers
+                        var customIcon = L.icon({
+                            iconUrl: 'https://cdn-icons-png.flaticon.com/512/252/252025.png', // Custom marker icon
+                            iconSize: [10, 10], // Icon size
+                            iconAnchor: [6, 12], // Anchor point of the icon
+                            popupAnchor: [0, -24] // Popup anchor
+                        });
+                        layer.setIcon(customIcon);
+                    }
+                });
+
+                // Add the layer to the map and to the checkbox list
+                var layerName = file.name;
+                kmlLayers[layerName] = kmlLayer;
+
+                // Create a checkbox for the imported layer
+                var checkboxDiv = document.getElementById('kml-checkboxes');
+                var checkboxId = 'kml-checkbox-' + layerName;
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = checkboxId;
+                checkbox.name = 'kml-layer';
+                checkbox.value = layerName;
+
+                var label = document.createElement('label');
+                label.htmlFor = checkboxId;
+                label.textContent = layerName;
+
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        // Add the layer to the map
+                        map.addLayer(kmlLayers[layerName]);
+                        map.fitBounds(kmlLayers[layerName].getBounds());
+                    } else {
+                        // Remove the layer from the map
+                        map.removeLayer(kmlLayers[layerName]);
+                    }
+                });
+
+                checkboxDiv.appendChild(checkbox);
+                checkboxDiv.appendChild(label);
+                checkboxDiv.appendChild(document.createElement('br'));
+
+                alert('KML file "' + layerName + '" successfully imported with custom styling!');
+            } catch (error) {
+                console.error('Error parsing KML file:', error);
+                alert("Invalid KML file.");
+            }
+        };
+        reader.readAsText(file);
+    } else {
+        alert("Please select a KML file.");
+    }
+};
+
+
+// Function to generate a color from the selected set
+function getRandomColor() {
+    var colors = ["yellow", "red", "magenta", "deeppink", "cyan", "lime"];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
         // Leaflet Draw Controls
         var drawControl = new L.Control.Draw({
             edit: {
@@ -135,57 +264,36 @@
             }
         });
         map.on('draw:created', function (e) {
-          var layer = e.layer;
-      
-          // Add the layer to the drawn items feature group
-          drawnItems.addLayer(layer);
-      
-          // Check if the drawn shape is a polygon
-          if (layer instanceof L.Polygon) {
-              // Get the coordinates of the polygon
-              var latlngs = layer.getLatLngs()[0];
-      
-              // Calculate the area (in square meters)
-              var area = L.GeometryUtil.geodesicArea(latlngs);
-      
-              // Calculate the perimeter (sum of distances between points)
-              var perimeter = 0;
-              for (var i = 0; i < latlngs.length - 1; i++) {
-                  perimeter += latlngs[i].distanceTo(latlngs[i + 1]);
-              }
-              perimeter += latlngs[latlngs.length - 1].distanceTo(latlngs[0]); // Close the polygon
-      
-              // Display area and perimeter in a popup
-              var content = `
-                  <strong>Safarrii:</strong><br>
-                  Bal'ina: ${area.toFixed(2)} m²<br>
-                  Dherina: ${perimeter.toFixed(2)} m
-              `;
-              layer.bindPopup(content).openPopup();
-          }
-      });
-        // Handle KML Import
-        document.getElementById('import-kml').onclick = function() {
-            var fileInput = document.getElementById('kml-file');
-            if (fileInput.files.length > 0) {
-                var file = fileInput.files[0];
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var kmlText = e.target.result;
-                    try {
-                        var kmlLayer = omnivore.kml.parse(kmlText);
-                        kmlLayer.addTo(map);
-                        map.fitBounds(kmlLayer.getBounds());
-                    } catch (error) {
-                        alert("Invalid KML file.");
-                    }
-                };
-                reader.readAsText(file);
-            } else {
-                alert("Please select a KML file.");
+            var layer = e.layer;
+        
+            // Add the layer to the drawn items feature group
+            drawnItems.addLayer(layer);
+        
+            // Check if the drawn shape is a polygon
+            if (layer instanceof L.Polygon) {
+                // Get the coordinates of the polygon
+                var latlngs = layer.getLatLngs()[0];
+        
+                // Calculate the area (in square meters)
+                var area = L.GeometryUtil.geodesicArea(latlngs);
+        
+                // Calculate the perimeter (sum of distances between points)
+                var perimeter = 0;
+                for (var i = 0; i < latlngs.length - 1; i++) {
+                    perimeter += latlngs[i].distanceTo(latlngs[i + 1]);
+                }
+                perimeter += latlngs[latlngs.length - 1].distanceTo(latlngs[0]); // Close the polygon
+        
+                // Display area and perimeter in a popup
+                var content = `
+                    <strong>Safarrii:</strong><br>
+                    Bal'ina: ${area.toFixed(2)} m²<br>
+                    Dherina: ${perimeter.toFixed(2)} m
+                `;
+                layer.bindPopup(content).openPopup();
             }
-        };
-
+        });
+    
         // Handle GeoJSON Export
         document.getElementById('export-geojson').onclick = function() {
             var geojson = drawnItems.toGeoJSON();

@@ -190,3 +190,12 @@ class Notification(models.Model):
 
     def _str_(self):
         return f"Notification for {self.user.username}: {self.message}"
+
+class Publication(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    pdf_file = models.FileField(upload_to='publications/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def _str_(self):
+        return self.title
