@@ -14,6 +14,7 @@ djangorestframework==3.15.2
 fabio==2024.9.0
 filelock==3.16.1
 fonttools==4.54.1
+GDAL @ file:///C:/Users/sata/Downloads/GDAL-3.10.1-cp311-cp311-win_amd64.whl#sha256=5def57b3c5512a5f6441497fc45b47d9aa83b1f1a56eb25a9c79dc1056ae1978
 geopandas==1.0.1
 gis==0.2.1
 greenlet==3.1.1
