@@ -6,10 +6,11 @@
 {% block content %}
 <div class="container my-4">
     <h1 class="text-center mb-4">Kuusaa Galmee Bankii Lafaa Waligalaa Kan Magaalaa</h1>
+
     <div style="text-align: center; margin: 10px 0;">
-    <a href="{% url 'export_submissions' %}" class="btn btn-success mb-3">Export Submissions as CSV</a>
-   
-    <!-- Styled Submission Table -->
+        <a href="{% url 'export_submissions' %}" class="btn btn-success mb-3">Export Submissions as CSV</a>
+    </div>
+
     <style>
         table {
             width: 100%;
@@ -48,10 +49,13 @@
                 <th>Qamaa Qophaef</th>
                 <th>Tajajila Qophaef</th>
                 <th>Balina Lafa</th>
+                <th>Lakk. Xalayaa Murtoo</th>
+                <th>Sadarka Iddoo</th>
+                <th>Gosa Investimentii</th>
+                <th>Sababa Qophaef</th>
+                <th>Kan Qophesse</th>
                 <th>Guyya Qophae</th>
-                <th>Shapefile</th>
-                <th>Ragaa Biroo</th>
-                <th>Mallattoo</th>
+                <th>Guyyaa Galma'e</th>
                 <th>Bal.Lafa bahi ta'e</th>
                 <th>Balina Lafa Hafe</th>
                 <th>Qaama bahi tahef</th>
@@ -77,24 +81,13 @@
                 <td>{{ submission.qamaa_qophaef }}</td>
                 <td>{{ submission.tajajila_qophaef }}</td>
                 <td>{{ submission.balina_lafa }}</td>
+                 <td>{{ submission.lakk_xalayaa_murtoo }}</td>
+                <td>{{ submission.sadarka_iddo }}</td>
+                <td>{{ submission.gosa_investimentii }}</td>
+                <td>{{ submission.sababa_qophaef }}</td>
+                <td>{{ submission.kan_qophesse }}</td>
                 <td>{{ submission.guyya_qophae }}</td>
-                <td>
-                    <a href="{{ submission.shapefile.url }}" class="btn btn-info" download>Shapefile buusi</a>
-                </td>
-                <td>
-                    <a href="{{ submission.Ragaa_biroo.url }}" download>
-                        <img src="{{ submission.Ragaa_biroo.url }}" alt="Suura Iddoo" width="40">
-                    </a>
-                </td>
-                <td>
-                    {% if submission.Mallattoo %}
-                        <a href="{{ submission.Mallattoo.url }}" download>
-                            <img src="{{ submission.Mallattoo.url }}" alt="mallattoo" width="30">
-                        </a>
-                    {% else %}
-                        No file available
-                    {% endif %}
-                </td>
+                <td>{{ submission.guyya_galmae }}</td>
                 <td>{{ submission.bal_lafa_bahi_tae }}</td>
                 <td>{{ submission.balina_lafa_hafe }}</td>
                 <td>{{ submission.qaama_bahi_tahef }}</td>
@@ -107,9 +100,9 @@
                             <img src="{{ submission.ragaittin_bahi_tae.url }}" alt="Ragaittin Bahe Tae" width="40">
                         </a>
                     {% else %}
-                        No file available
+                        No file
                     {% endif %}
-                </td> <!-- Updated cell for ragaittin_bahi_tae -->
+                </td>
                 <td>
                     <a href="#" class="btn btn-primary load-geojson" data-geojson-url="{{ submission.shapefile.url }}">Show on Map</a>
                     <a href="{% url 'edit_submission' submission.id %}" class="btn btn-warning">Edit</a>
@@ -118,12 +111,11 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="22">No submissions found.</td>
+                <td colspan="30" class="text-center">No submissions found.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-</div>
 
     <!-- Pagination Controls -->
     <div class="pagination" style="text-align: center; margin: 20px 0;">
@@ -143,8 +135,5 @@
             {% endif %}
         </span>
     </div>
-</div>
-</body>
-</html>
 </div>
 {% endblock %}

@@ -1,9 +1,10 @@
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser,User
 from django.db import models
 import datetime
 from django.core.exceptions import ValidationError
+from django.contrib.gis.db import models as gis_models
 
 User = get_user_model()
 
@@ -133,6 +134,7 @@ class ShegarLandForm(models.Model):
     ]
     
     # Model fields
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     Kutaamagaalaa = models.CharField(max_length=50, choices=Kutaamagaalaa_choices)
     Aanaa = models.CharField(max_length=50, choices=Aanaa_choices)
     iddo_adda = models.CharField(max_length=30, blank=True, null=True)
@@ -144,58 +146,67 @@ class ShegarLandForm(models.Model):
     qamaa_qophaef = models.CharField(max_length=50, blank=True, null=True)
     tajajila_qophaef = models.CharField(max_length=50, choices=tajajila_qophaef_choices)
     balina_lafa = models.DecimalField(max_digits=10, decimal_places=2)
+    lakk_xalayaa_murtoo = models.CharField(max_length=255, blank=True, null=True)
+    sadarka_iddo = models.CharField(max_length=255, blank=True, null=True)
+    gosa_investimentii = models.CharField(max_length=255, blank=True, null=True)
+    sababa_qophaef = models.CharField(max_length=255, blank=True, null=True)
     kan_qophesse = models.CharField(max_length=40, default='user', blank=True, null=True)
     guyya_qophae = models.DateField()
     guyya_galmae = models.DateField(null=True, blank=True, default=datetime.date.today)
-    shapefile = models.FileField(upload_to='shapefiles/')
-    Ragaa_biroo = models.ImageField(upload_to='images/')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+
     ragaittin_bahi_tae = models.ImageField(upload_to='images/', blank=True, null=True)
-    Mallattoo = models.ImageField(upload_to='images/', blank=True, null=True)
     guyyaa_bahi_tae = models.DateField(blank=True, null=True)
-    
-    # Remove the restrictive validator from DecimalField
-    bal_lafa_bahi_tae = models.DecimalField(
-        max_digits=8, decimal_places=6, default=0.0, blank=True, null=True
-    )
-    bal_lafa_hafe = models.DecimalField(
-        max_digits=8, decimal_places=6, default=0.0, blank=True, null=True
-    )
+    bal_lafa_bahi_tae = models.DecimalField(max_digits=8, decimal_places=6, default=0.0, blank=True, null=True)
+    bal_lafa_hafe = models.DecimalField(max_digits=8, decimal_places=6, default=0.0, blank=True, null=True)
 
     qaama_bahi_tahef = models.CharField(max_length=40, blank=True, null=True)
     tajajila_bahi_tahef = models.CharField(max_length=40, blank=True, null=True)
     kan_bahi_taasise = models.CharField(max_length=255, blank=True, null=True)
 
+    geom = gis_models.PolygonField(srid=32637, null=True, blank=True)
+
     def save(self, *args, **kwargs):
-        # Automatically populate bal_lafa_hafe if balina_lafa is filled by user
         if self.balina_lafa and not self.bal_lafa_hafe:
             self.bal_lafa_hafe = self.balina_lafa
-
-        # Adjust bal_lafa_hafe if bal_lafa_bahi_tae is filled by admin
-        if self.bal_lafa_bahi_tae:
+        if self.balina_lafa and self.bal_lafa_bahi_tae:
             self.bal_lafa_hafe = self.balina_lafa - self.bal_lafa_bahi_tae
-
         super().save(*args, **kwargs)
 
-    def _str_(self):
-        return self.Kutaamagaalaa
-
-
-# Model for Notifications
+    def __str__(self):
+        return f"{self.Kutaamagaalaa}"
+    
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)  # Track read/unread status
+    is_read = models.BooleanField(default=False)
 
     def _str_(self):
         return f"Notification for {self.user.username}: {self.message}"
+    
+import datetime
+from django.contrib.gis.db import models as gis_models
+from django.contrib.auth.models import User
 
-class Publication(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    pdf_file = models.FileField(upload_to='publications/')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+class Parcel(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    Kutaamagaalaa = models.CharField("Kutaa Magaalaa", max_length=50)
+    Aanaa = models.CharField("Aanaa", max_length=50)
+    iddo_adda = models.CharField("Iddoo Addaa", max_length=30, blank=True, null=True)
+    lakk_adda = models.IntegerField( default=0, blank=True, null=True)
+    gosa_tajajila = models.CharField( max_length=50)
+    madda_lafa = models.CharField(max_length=50)
+    tajajila_iddo = models.CharField(max_length=60)
+    name = models.CharField(max_length=100)
+    land_use = models.CharField(max_length=100)
+    haala_beenya = models.CharField(max_length=20)
+    qamaa_qophaef = models.CharField(max_length=50)
+    tajajila_qophaef = models.CharField(max_length=50)
+    balina_lafa = models.DecimalField(max_digits=10, decimal_places=2)
+    kan_qophesse = models.CharField(max_length=40, default='user', blank=True, null=True)
+    guyya_qophae = models.DateField("Guyyaa Qophaaye")
+    guyya_galmae = models.DateField("Guyyaa Galmaa'e", null=True, blank=True, default=datetime.date.today)
+    geom = gis_models.PolygonField(srid=32637)
 
-    def _str_(self):
-        return self.title
+    def __str__(self):
+        return f"{self.Kutaamagaalaa} "

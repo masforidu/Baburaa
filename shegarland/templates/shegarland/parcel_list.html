@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>My Parcels</h2>
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<style>
+    .map-preview {
+        width: 200px;
+        height: 150px;
+    }
+</style>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Owner</th>
+            <th>Kutaa Magaalaa</th>
+            <th>Aanaa</th>
+            <th>Iddo Addaa</th>
+            <th>Lakk Addaa</th>
+            <th>Gosa Tajaajila</th>
+            <th>Madda Lafa</th>
+            <th>Tajaajila Iddoo</th>
+            <th>Haala Beenya</th>
+            <th>Name</th>
+            <th>Tajaajila Qophaef</th>
+            <th>Bal’ina Lafa</th>
+            <th>Kan Qopheesse</th>
+            <th>Guyyaa Qopha’e</th>
+            <th>Guyyaa Galma'e</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for parcel in parcels %}
+        <tr>
+            <td>{{ parcel.owner }}</td>
+            <td>{{ parcel.Kutaamagaalaa }}</td>
+            <td>{{ parcel.Aanaa }}</td>
+            <td>{{ parcel.iddo_adda }}</td>
+            <td>{{ parcel.lakk_adda }}</td>
+            <td>{{ parcel.gosa_tajajila }}</td>
+            <td>{{ parcel.madda_lafa }}</td>
+            <td>{{ parcel.tajajila_iddo }}</td>
+            <td>{{ parcel.haala_beenya }}</td>
+            <td>{{ parcel.name }}</td>
+            <td>{{ parcel.tajajila_qophaef }}</td>
+            <td>{{ parcel.balina_lafa }}</td>
+            <td>{{ parcel.kan_qophesse }}</td>
+            <td>{{ parcel.guyya_qophae }}</td>
+            <td>{{ parcel.guyya_galmae }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="15" class="text-center">No parcels found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Leaflet JS + Wicket for WKT -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/wicket/wicket.js"></script>
+<script src="https://unpkg.com/wicket/wicket-leaflet.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        {% for parcel in parcels %}
+            var wktText = document.getElementById("wkt_{{ parcel.id }}").innerText;
+            var map = L.map("map_{{ parcel.id }}", {
+                zoomControl: false,
+                attributionControl: false
+            }).setView([9, 39], 10);  // fallback view
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+            }).addTo(map);
+
+            try {
+                var wkt = new Wkt.Wkt();
+                wkt.read(wktText);
+                var feature = wkt.toObject();
+                feature.addTo(map);
+                map.fitBounds(feature.getBounds());
+            } catch (e) {
+                console.error("Invalid WKT for parcel {{ parcel.id }}");
+            }
+        {% endfor %}
+    });
+</script>
+
+{% endblock %}

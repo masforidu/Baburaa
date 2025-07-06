@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
 {% block title %}Fuulaa Galmee Qophii fi Bankii Lafaa{% endblock %}
@@ -9,316 +8,287 @@
 <a href="{% url 'logout' %}" class="btn btn-outline-danger ml-2">Logout</a>
 </div>
 </nav>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css" />
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-geometryutil"></script>
-    
-    <style>
-        .form-container {
-            background-color: #B2FFFF;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 1 2px 10px rgba(34, 191, 7, 0.1);
-            margin: 40px;
-            max-width: 800px;
-        }
-        .form-container button {
-            background-color: #007bff;
-            color: cyan;
-            padding: 20px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .form-container button:hover {
-            background-color: #0056b3;
-        }
-        .coordinates-input {
-            margin: 20px 0;
-        }
-        label {
-            font-weight: bold;
-        }
-        .required-field::after {
-            content: "*";
-            color: red;
-            margin-left: 5px;
-        }
-        #map {
-            height: 600px;
-            width: 200%;
-            margin: 20px 0;
-        }
-        footer {
-            text-align: center;
-            padding: 10px;
-            background:rgb(200, 12, 156);
-            color: #fff;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-        }
-    </style>
-        <h1>Fuulaa Galmee Qophii fi Bankii Lafaa</h1>
-    <!-- Notification messages -->
-    {% if messages %}
-        <ul>
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
 
-    <!-- Form Section -->
-    <div class="form-container">
-        <form method="POST" enctype="multipart/form-data">
-            <h2 style="margin-top: 20px;">Kutaa 1ffaa : Kutaan kun D/garee Qophii ykn Baankii lafaa K/Magaalaan qofaa kan Guutamuu dha </h2>
-    <p style="margin-bottom: 10px;">Kabajamoo! Ragaa armaan Gadii of-eggannoon sirriitti guutaa</p>
-            {% csrf_token %}
-            {% for field in form %}
-                <div>
-                    <label for="{{ field.id_for_label }}" class="{% if field.field.required %}required-field{% endif %}">
-                        {{ field.label }}
-                    </label>
+<!-- Leaflet & Draw CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
 
-                    {% if field.name in admin_only_fields %}
-                        {% if user.is_superuser %}
-                            {{ field }}
-                            <span class="admin-note">(Only editable by admins)</span>
-                        {% else %}
-                            <input type="text" value="{{ field.value|default_if_none:"" }}" readonly>
-                            <span class="admin-note">(Admin only field - not editable by regular users)</span>
-                        {% endif %}
-                    {% else %}
+<style>
+    .form-container {
+        background-color: #B2FFFF;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 1 2px 10px rgba(34, 191, 7, 0.1);
+        margin: 40px auto;
+        max-width: 800px;
+    }
+    .form-container button {
+        background-color: #007bff;
+        color: cyan;
+        padding: 20px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .form-container button:hover {
+        background-color: #0056b3;
+    }
+    .coordinates-input {
+        margin: 20px 0;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .coordinates-input label {
+        font-weight: bold;
+    }
+    .required-field::after {
+        content: "*";
+        color: red;
+        margin-left: 5px;
+    }
+    #map {
+        height: 600px;
+        width: 100%;
+        max-width: 900px;
+        margin: 20px auto;
+        border: 2px solid #444;
+        border-radius: 10px;
+    }
+    footer {
+        text-align: center;
+        padding: 10px;
+        background: rgb(200, 12, 156);
+        color: #fff;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+    }
+    .admin-note {
+        font-style: italic;
+        color: #a00;
+        font-size: 0.85em;
+        margin-left: 8px;
+    }
+</style>
+
+<h1 style="text-align: center;">Fuulaa Galmee Qophii fi Bankii Lafaa</h1>
+
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<div class="form-container">
+    <form method="POST" enctype="multipart/form-data" id="landForm" onsubmit="return validateGeom();">
+        <h2>Kutaa 1ffaa : Kutaan kun D/garee Qophii ykn Baankii lafaa K/Magaalaan qofaa kan Guutamuu dha</h2>
+        <p>Kabajamoo! Ragaa armaan Gadii of-eggannoon sirriitti guutaa</p>
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="{% if field.field.required %}required-field{% endif %}">
+                    {{ field.label }}
+                </label>
+
+                {% if field.name in admin_only_fields %}
+                    {% if user.is_superuser %}
                         {{ field }}
+                        <span class="admin-note">(Only editable by admins)</span>
+                    {% else %}
+                        <input type="text" value="{{ field.value|default_if_none:"" }}" readonly>
+                        <span class="admin-note">(Admin only field - not editable by regular users)</span>
                     {% endif %}
-
-                    <div class="help-text">{{ field.help_text }}</div>
-                </div>
-
-                {% if field.name == 'Mallattoo' %}
-                    <!-- Add section heading here -->
-                    <h2 style="margin-top: 20px;">Kutaa 2ffaa: Daarektara ykn D/Garee Qophii fi baankii lafaa W/ra Gidduu galeessan kan Guutamuu</h2>
+                {% else %}
+                    {{ field }}
                 {% endif %}
-            {% endfor %}
+                <div class="help-text">{{ field.help_text }}</div>
+            </div>
 
-            {% if submission %}
-                <input type="hidden" name="submission_id" value="{{ submission.id }}">  <!-- For editing -->
+            {% if field.name == 'Mallattoo' %}
+                <h2>Kutaa 2ffaa: Daarektara ykn D/Garee Qophii fi baankii lafaa W/ra Gidduu galeessan kan Guutamuu</h2>
             {% endif %}
-            <button type="submit">Ergi</button>
-        </form>
-    </div>
+        {% endfor %}
 
-     <!-- Link to dashboard -->
-     <div style="text-align: center; margin: 10px 0;">
-        <a href="{% url 'dashboard' %}">Gara kuusa ragaa</a>
-    </div>
+        {% if submission %}
+            <input type="hidden" name="submission_id" value="{{ submission.id }}">
+        {% endif %}
 
-     <!-- UTM Coordinate Input Section -->
-     <div class="coordinates-input">
-        <label for="easting">UTM Easting:</label>
-        <input type="number" id="easting" placeholder="Enter UTM Easting" />
-        <label for="northing">UTM Northing:</label>
-        <input type="number" id="northing" placeholder="Enter UTM Northing" />
-        <button id="go-to-coordinates">Gara Koordi.Deemi</button>
-    </div>
+        <!-- Hidden field for geometry -->
+        <input type="hidden" id="geojson-input" name="geometry" />
 
-    <!-- Live Location Button -->
+        <button type="submit">Ergi</button>
+    </form>
+</div>
+
+<div style="text-align: center; margin: 10px 0;">
+    <a href="{% url 'dashboard' %}">Gara kuusa ragaa</a>
+</div>
+
+<!-- UTM Coordinates -->
+<div class="coordinates-input">
+    <label for="easting">UTM Easting:</label>
+    <input type="number" id="easting" placeholder="Enter UTM Easting" />
+    <label for="northing">UTM Northing:</label>
+    <input type="number" id="northing" placeholder="Enter UTM Northing" />
+    <button id="go-to-coordinates">Gara Koordi.Deemi</button>
+</div>
+
+<!-- Live Location -->
+<div style="text-align:center; margin-bottom: 15px;">
     <button id="find-location">Find My Location</button>
+</div>
 
-    <!-- Map Container -->
-    <div id="map"></div>
+<!-- Map container -->
+<div id="map"></div>
 
-    <!-- KML Upload -->
+<!-- KML Upload -->
+<div style="text-align:center; margin: 20px 0;">
     <input type="file" id="kml-file" accept=".kml" />
     <button id="import-kml">KML Fidi</button>
+</div>
 
-    <!-- Export Button -->
+<!-- GeoJSON Export -->
+<div style="text-align:center; margin: 20px 0;">
     <button id="export-geojson">Shapefile Buusi</button>
+</div>
 
-    <!-- Include Leaflet JS and leaflet-omnivore -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
-    <script src="https://unpkg.com/leaflet-omnivore@latest/leaflet-omnivore.min.js"></script>
-    <script src="https://unpkg.com/leaflet-providers@1.13.0/leaflet-providers.js"></script>
-    <script src="{% static 'js/proj4.js' %}"></script>
-    <script src="{% static 'js/papaparse.min.js' %}"></script> 
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script src="https://unpkg.com/leaflet-geometryutil"></script>
+<script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/proj4@2.7.5"></script>
 
-    <!-- UTM conversion library -->
-    <script src="https://cdn.jsdelivr.net/npm/proj4"></script>
+<script>
+    const map = L.map("map").setView([9.0, 39.0], 7);
 
-    <script>
-        // Initialize the map and set its view to a default location and zoom level
-        var map = L.map('map').setView([0, 0], 2); // Adjust to your desired initial location
+    // Google satellite using subdomains
+    L.tileLayer("https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", {
+        maxZoom: 20,
+        subdomains: ["mt0", "mt1", "mt2", "mt3"],
+        attribution: '&copy; <a href="https://www.google.com/maps">Google Maps</a>',
+    }).addTo(map);
 
-        // Add the Google Satellite tile layer
-        L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}&key=AIzaSyA8rBeGfJPkPAQwdSuo7YYuW1d2gqks_TA', {
-            maxZoom: 20,
-        }).addTo(map);
-        
-        // Initialize feature group to store drawn items
-        var drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
+    const drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
 
-        // Initialize Leaflet Draw controls
-        var drawControl = new L.Control.Draw({
-            edit: {
-                featureGroup: drawnItems // Specify the layer to edit
-            },
-            draw: {
-                polygon: true,
-                polyline: true,
-                rectangle: true,
-                circle: true,
-                marker: true,
+    const drawControl = new L.Control.Draw({
+        draw: {
+            polygon: true,
+            rectangle: true,
+            polyline: false,
+            circle: false,
+            marker: true,
+            circlemarker: false,
+        },
+        edit: {
+            featureGroup: drawnItems,
+        },
+    });
+    map.addControl(drawControl);
+
+    map.on("draw:created", function (e) {
+        drawnItems.clearLayers();
+        drawnItems.addLayer(e.layer);
+
+        const geometry = e.layer.toGeoJSON().geometry;
+        document.getElementById("geojson-input").value = JSON.stringify(geometry);
+
+        if (e.layer instanceof L.Polygon) {
+            const latlngs = e.layer.getLatLngs()[0];
+            const area = L.GeometryUtil.geodesicArea(latlngs);
+            let perimeter = 0;
+            for (let i = 0; i < latlngs.length - 1; i++) {
+                perimeter += latlngs[i].distanceTo(latlngs[i + 1]);
             }
-        });
-        map.addControl(drawControl);
-   // Save to localStorage
-    function saveToLocalStorage() {
-        var data = drawnItems.toGeoJSON();
-        localStorage.setItem('drawnItems', JSON.stringify(data));
-    }
+            perimeter += latlngs[latlngs.length - 1].distanceTo(latlngs[0]);
 
-    map.on('draw:created', function(e) {
-        var layer = e.layer;
-        drawnItems.addLayer(layer);
-        saveToLocalStorage();
+            const popupContent = `
+                <strong>Safarrii:</strong><br>
+                Bal'ina: ${area.toFixed(2)} m²<br>
+                Dherina: ${perimeter.toFixed(2)} m
+            `;
+            e.layer.bindPopup(popupContent).openPopup();
+        }
     });
 
-    map.on('draw:edited', saveToLocalStorage);
-    map.on('draw:deleted', saveToLocalStorage);
+    function validateGeom() {
+        const value = document.getElementById("geojson-input").value;
+        if (!value.trim()) {
+            alert("Please draw the parcel on the map before submitting.");
+            return false;
+        }
+        return true;
+    }
 
-        // Event listener for shape creation
-        map.on('draw:created', function (e) {
-            var layer = e.layer;
-            drawnItems.addLayer(layer);
-        });
+    // Go to UTM coordinates
+    document.getElementById("go-to-coordinates").addEventListener("click", function () {
+        const easting = parseFloat(document.getElementById("easting").value);
+        const northing = parseFloat(document.getElementById("northing").value);
+        if (easting && northing) {
+            const latLng = proj4("EPSG:32637", "EPSG:4326", [easting, northing]);
+            map.setView([latLng[1], latLng[0]], 14);
+            L.marker([latLng[1], latLng[0]])
+                .addTo(map)
+                .bindPopup("Marker at UTM coordinates:<br>Easting: " + easting + "<br>Northing: " + northing)
+                .openPopup();
+        } else {
+            alert("Please enter valid UTM coordinates.");
+        }
+    });
 
-        // Handle form submission
-        document.querySelector('form').addEventListener('submit', function(event) {
-            var geojsonData = JSON.stringify(drawnItems.toGeoJSON());
-            document.getElementById('geojson-input').value = geojsonData; // Populate hidden input
-        });
+    // Find current location
+    document.getElementById("find-location").addEventListener("click", function () {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                map.setView([lat, lng], 14);
+                L.marker([lat, lng]).addTo(map).bindPopup("You are here!").openPopup();
+            }, function () {
+                alert("Could not get your location.");
+            });
+        } else {
+            alert("Geolocation not supported by this browser.");
+        }
+    });
 
-        // Handle UTM Coordinate Input (for EPSG:32637)
-        document.getElementById('go-to-coordinates').addEventListener('click', function() {
-            var easting = parseFloat(document.getElementById('easting').value);  // X coordinate (Easting)
-            var northing = parseFloat(document.getElementById('northing').value);  // Y coordinate (Northing)
-
-            if (easting && northing) {
-                // Convert UTM (EPSG:32637) to Lat/Lon (EPSG:4326)
-                var latLng = proj4('EPSG:32637', 'EPSG:4326', [easting, northing]);
-                
-                // Set map view to the converted Lat/Lon and zoom in
-                map.setView([latLng[1], latLng[0]], 14);
-
-                // Add a marker at the converted Lat/Lon position
-                var marker = L.marker([latLng[1], latLng[0]]).addTo(map)
-                    .bindPopup("Marker at UTM coordinates:<br>Easting: " + easting + "<br>Northing: " + northing)
-                    .openPopup();
-            } else {
-                alert('Please enter valid UTM coordinates.');
-            }
-        });
-
-        // Handle live location
-        document.getElementById('find-location').addEventListener('click', function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var lat = position.coords.latitude;
-                    var lng = position.coords.longitude;
-                    map.setView([lat, lng], 14);
-                    L.marker([lat, lng]).addTo(map).bindPopup("You are here!").openPopup();
-                }, function() {
-                    alert('Could not get your location.');
-                });
-            } else {
-                alert('Geolocation is not supported by this browser.');
-            }
-        });
-        map.on('draw:created', function (e) {
-            var layer = e.layer;
-        
-            // Add the layer to the drawn items feature group
-            drawnItems.addLayer(layer);
-        
-            // Check if the drawn shape is a polygon
-            if (layer instanceof L.Polygon) {
-                // Get the coordinates of the polygon
-                var latlngs = layer.getLatLngs()[0];
-        
-                // Calculate the area (in square meters)
-                var area = L.GeometryUtil.geodesicArea(latlngs);
-        
-                // Calculate the perimeter (sum of distances between points)
-                var perimeter = 0;
-                for (var i = 0; i < latlngs.length - 1; i++) {
-                    perimeter += latlngs[i].distanceTo(latlngs[i + 1]);
+    // Import KML
+    document.getElementById("import-kml").onclick = function () {
+        const fileInput = document.getElementById("kml-file");
+        if (fileInput.files.length > 0) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const kmlText = e.target.result;
+                try {
+                    const kmlLayer = omnivore.kml.parse(kmlText);
+                    kmlLayer.addTo(map);
+                    map.fitBounds(kmlLayer.getBounds());
+                } catch (error) {
+                    alert("Error loading KML file.");
                 }
-                perimeter += latlngs[latlngs.length - 1].distanceTo(latlngs[0]); // Close the polygon
-        
-                // Display area and perimeter in a popup
-                var content = `
-                    <strong>Safarrii:</strong><br>
-                    Bal'ina: ${area.toFixed(2)} m²<br>
-                    Dherina: ${perimeter.toFixed(2)} m
-                `;
-                layer.bindPopup(content).openPopup();
-            }
-        });
-        // Handle KML import 
-        document.getElementById('import-kml').onclick = function() {
-            var fileInput = document.getElementById('kml-file');
-            if (fileInput.files.length > 0) {
-                var file = fileInput.files[0];
-                var reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    var kmlText = e.target.result;
+            };
+            reader.readAsText(fileInput.files[0]);
+        } else {
+            alert("Please select a KML file.");
+        }
+    };
 
-                    // Debug: log the KML content
-                    console.log("KML Content Loaded:", kmlText);
-
-                    try {
-                        // Parse KML using leaflet-omnivore
-                        var kmlLayer = omnivore.kml.parse(kmlText);
-
-                        // Add the parsed KML layer to the map
-                        kmlLayer.addTo(map);
-                        
-                        // Fit map to KML layer bounds
-                        map.fitBounds(kmlLayer.getBounds());
-
-                        console.log("KML added to map successfully!");
-
-                    } catch (error) {
-                        console.error("Error parsing or adding KML:", error);
-                        alert("Error adding KML to the map. Please check the KML file format.");
-                    }
-                };
-
-                reader.onerror = function() {
-                    console.error("Error reading the KML file");
-                };
-
-                reader.readAsText(file);  // Read KML file as text
-            } else {
-                alert("Please select a KML file to upload.");
-            }
-        };
-
-        // Handle GeoJSON export
-        document.getElementById('export-geojson').onclick = function() {
-            var geojson = drawnItems.toGeoJSON();
-            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geojson));
-            var a = document.createElement('a');
-            a.setAttribute("href", dataStr);
-            a.setAttribute("download", "drawings.geojson");
-            a.click();
-        };
-    </script>
-</body>
-</html>
-</div>
+    // Export GeoJSON
+    document.getElementById("export-geojson").onclick = function () {
+        const geojson = drawnItems.toGeoJSON();
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geojson));
+        const a = document.createElement("a");
+        a.setAttribute("href", dataStr);
+        a.setAttribute("download", "drawings.geojson");
+        a.click();
+    };
+</script>
 {% endblock %}

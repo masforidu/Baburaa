@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Add Parcel</h2>
+
+<form method="post" onsubmit="return validateGeom();">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <!-- Hidden field for geometry -->
+    <input type="hidden" id="geom" name="geom">
+
+    <div id="map" style="height: 500px; margin-bottom: 20px;"></div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<!-- Include Leaflet and Leaflet Draw -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+
+<script>
+    const map = L.map('map').setView([9.0, 39.0], 10);
+    L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 24
+    }).addTo(map);
+
+    const drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+
+    const drawControl = new L.Control.Draw({
+        draw: {
+            polygon: true,
+            rectangle: true,
+            polyline: false,
+            circle: false,
+            marker: false
+        },
+        edit: {
+            featureGroup: drawnItems
+        }
+    });
+    map.addControl(drawControl);
+
+    map.on('draw:created', function (e) {
+        drawnItems.clearLayers();
+        drawnItems.addLayer(e.layer);
+
+        const geojson = e.layer.toGeoJSON().geometry;
+        const geomField = document.getElementById('geom');
+        geomField.value = JSON.stringify(geojson);
+        console.log("Saved Geometry:", geomField.value);
+    });
+
+    function validateGeom() {
+        const geom = document.getElementById('geom').value;
+        if (!geom.trim()) {
+            alert("Please draw the parcel on the map before submitting.");
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock %}

@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, ShegarLandFormForm
+from django.contrib.gis.geos import GEOSGeometry
 from django.views.decorators.csrf import csrf_exempt
 import json 
 from django.http import JsonResponse
@@ -139,20 +140,18 @@ def logout_view(request):
 
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from .models import ShegarLandForm
 
-# Dashboard view (protected)
 @login_required
 def dashboard(request):
-    submissions = ShegarLandForm.objects.filter(user=request.user)  # Get submissions for the logged-in user
-    
-    # Implement pagination
-    paginator = Paginator(submissions, 5)  # Show 10 submissions per page
-    page_number = request.GET.get('page')  # Get the current page number from the query parameters
-    page_obj = paginator.get_page(page_number)  # Get the page object for the current page
-    
-    return render(request, 'shegarland/dashboard.html', {'page_obj': page_obj})
-
+    submissions = ShegarLandForm.objects.filter(user=request.user)
+    paginator = Paginator(submissions, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'shegarland/dashboard.html', {
+        'page_obj': page_obj,
+        'show_map': True  # Enable map preview
+    })
 # Admin dashboard view
 from django.core.paginator import Paginator
 @login_required
@@ -184,61 +183,90 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import ShegarLandForm, Notification, User
-from .forms import ShegarLandFormForm  # Ensure you have created this form class
+from .forms import ShegarLandFormForm
 import json
+import logging
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.gdal import SpatialReference, CoordTransform
 
+logger = logging.getLogger(__name__)  # Setup logger
+
+
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.error import GEOSException
+from django.contrib.auth.models import User
+from .models import Notification
+from .forms import ShegarLandFormForm  # Assuming this is your main form
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+# views.py
 @login_required
 def submit_form(request):
     admin_only_fields = [
         'bal_lafa_bahi_tae', 'bal_lafa_hafe', 'qaama_bahi_tahef',
-        'tajajila_bahi_tahef', 'kan_bahi_taasise', 'ragaittin_bahi_tae', 
+        'tajajila_bahi_tahef', 'kan_bahi_taasise', 'ragaittin_bahi_tae',
         'guyyaa_bahi_tae'
-    ] 
+    ]
 
     if request.method == 'POST':
         form = ShegarLandFormForm(request.POST, request.FILES, user=request.user)
+        geom_geojson = request.POST.get('geometry') or request.POST.get('geom')
 
-        if form.is_valid():
-            # Set user field
-            form.instance.user = request.user
+        if form.is_valid() and geom_geojson:
+            form_instance = form.save(commit=False)
+            form_instance.user = request.user
 
-            # Set admin-only fields based on user role
             if request.user.is_staff:
-                # Admins fill out admin-only fields
                 for field in admin_only_fields:
-                    setattr(form.instance, field, form.cleaned_data.get(field))
+                    setattr(form_instance, field, form.cleaned_data.get(field))
             else:
-                # Non-admins should not be able to fill these fields, set them to None
                 for field in admin_only_fields:
-                    setattr(form.instance, field, None)
+                    setattr(form_instance, field, None)
 
-            form.save()
-            messages.success(request, 'Your submission was successful!')
+            try:
+                geojson_obj = json.loads(geom_geojson)
+                geometry = GEOSGeometry(json.dumps(geojson_obj), srid=4326)
 
-            # Notify admin users only when it's a regular user submission
-            if not request.user.is_staff:
-                admin_users = User.objects.filter(is_staff=True)
-                for admin in admin_users:
-                    Notification.objects.create(
-                        user=admin,
-                        message=f"A new submission was received from {request.user.username}.",
-                    )
-            
-            return redirect('dashboard')  # Redirect after submission
+                if not geometry.valid:
+                    messages.error(request, "Invalid geometry.")
+                    return render(request, 'shegarland/form.html', {'form': form, 'admin_only_fields': admin_only_fields})
 
+                form_instance.geom = geometry
+                form_instance.save()
+
+                if not request.user.is_staff:
+                    admin_users = User.objects.filter(is_staff=True)
+                    for admin in admin_users:
+                        Notification.objects.create(
+                            user=admin,
+                            message=f"A new submission was received from {request.user.username}.",
+                        )
+
+                messages.success(request, 'Your submission was successful!')
+                return redirect('dashboard')
+
+            except (ValueError, GEOSException, json.JSONDecodeError) as e:
+                logger.error(f"Geometry error: {e}")
+                messages.error(request, f"Error saving geometry: {e}")
         else:
-            # Log form errors to the console for debugging
-            print(form.errors)  # Log errors in the console
-
-            # Display specific errors to the user
-            for field, error_messages in form.errors.items():
-                for message in error_messages:
-                    messages.error(request, f"Error in {field}: {message}")
+            if not geom_geojson:
+                messages.error(request, "Please draw geometry on the map.")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Error in {field}: {error}")
 
     else:
         form = ShegarLandFormForm(user=request.user)
 
-    return render(request, 'shegarland/form.html', {'form': form, 'admin_only_fields': admin_only_fields})
+    return render(request, 'shegarland/form.html', {
+        'form': form,
+        'admin_only_fields': admin_only_fields
+    })
 
 @csrf_exempt
 def save_drawing(request):
@@ -484,7 +512,7 @@ def all_time_report(request):
     return render(request, 'shegarland/all_time_report.html', context)
 from datetime import datetime, timedelta
 from django.shortcuts import render
-from django.db.models import Sum, F
+from django.db.models import Sum
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator
 from .models import ShegarLandForm  # Ensure you import your model
@@ -679,40 +707,41 @@ from django.shortcuts import render
 def map_view(request):
     return render(request, 'shegarland/map.html')
 
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import FileResponse
-from .models import Publication
-from .forms import PublicationForm
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
+from django.contrib.gis.geos import GEOSGeometry
+from .forms import ParcelForm
+from .models import Parcel
+from django.contrib.auth.decorators import login_required
 
-# Check if user is an admin
-def is_admin(user):
-    return user.is_staff
-
-# Admin-only upload view
 @login_required
-@user_passes_test(is_admin)
-def upload_publication(request):
+def add_parcel(request):
     if request.method == 'POST':
-        form = PublicationForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('publication_list')
+        form = ParcelForm(request.POST)
+        geom = request.POST.get('geom')
+        if form.is_valid() and geom:
+            parcel = form.save(commit=False)
+            parcel.owner = request.user
+            parcel.geom = GEOSGeometry(geom, srid=4326)  # frontend GeoJSON is WGS84
+            parcel.save()
+            return redirect('shegarland/parcel_list.html')
+        else:
+            if not geom:
+                form.add_error('geom', 'Geometry is required.')
     else:
-        form = PublicationForm()
-    return render(request, 'publications/upload.html', {'form': form})
+        form = ParcelForm()
+    return render(request, 'shegarland/add_parcel.html', {'form': form})
 
-# Serve PDF file for download
-def download_publication(request, pk):
-    """Allow users to download a publication file"""
-    publication = get_object_or_404(Publication, pk=pk)
-    return FileResponse(open(publication.pdf_file.path, 'rb'), as_attachment=True)
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Parcel
 
-def publication_list(request):
-    publications = Publication.objects.all().order_by('-created_at')
-    print(publications)  # Debugging: Check if publications exist
-    return render(request, 'publications/publication_list.html', {'publications': publications})
-
-def publication_detail(request, pk):
-    publication = get_object_or_404(Publication, pk=pk)
-    return render(request, 'publications/publication_detail.html', {'publication': publication})
+@login_required
+def parcel_list(request):
+    if request.user.is_superuser or request.user.is_staff:
+        # Admin can see all
+        parcels = Parcel.objects.all()
+    else:
+        # Regular user sees only their parcels
+        parcels = Parcel.objects.filter(owner=request.user)
+    
+    return render(request, 'shegarland/parcel_list.html', {'parcels': parcels})

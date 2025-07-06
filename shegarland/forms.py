@@ -14,56 +14,51 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
 
 class ShegarLandFormForm(forms.ModelForm):
-    guyya_qophae = forms.DateField(
-        widget=forms.DateInput(attrs={
-            'type': 'date',
-            'class': 'form-control',
-        })
-    )
+    guyya_qophae = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
+    guyyaa_bahi_tae = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
+    guyya_galmae = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
 
-    class Meta:
-        model = ShegarLandForm
-        fields = [
-            'Kutaamagaalaa', 'Aanaa', 'iddo_adda', 'lakk_adda', 'gosa_tajajila',
-            'madda_lafa', 'tajajila_iddo', 'haala_beenya','qamaa_qophaef',
-            'tajajila_qophaef', 'balina_lafa', 'kan_qophesse', 'guyya_qophae',
-            'shapefile', 'Ragaa_biroo', 'Mallattoo',
-            'bal_lafa_bahi_tae', 'bal_lafa_hafe',
-            'qaama_bahi_tahef', 'tajajila_bahi_tahef',
-            'kan_bahi_taasise', 'ragaittin_bahi_tae', 'guyyaa_bahi_tae',
-        ]
-       
-    def __init__(self, *args, **kwargs):  # Corrected from _init to _init_
-        user = kwargs.pop('user', None)  # Extract user from kwargs
-        print("Initializing form with user:", user)  # Debug print
-        super(ShegarLandFormForm, self).__init__(*args, **kwargs)  # Call the parent constructor
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)  # ✅ Fixed from _init to _init_
 
-        # Check if user is not admin
         if user and not user.is_staff:
-            # Make additional fields read-only
             read_only_fields = [
                 'bal_lafa_bahi_tae', 'bal_lafa_hafe', 'qaama_bahi_tahef',
                 'tajajila_bahi_tahef', 'kan_bahi_taasise', 'guyyaa_bahi_tae',
             ]
             for field in read_only_fields:
-                self.fields[field].widget.attrs['readonly'] = 'readonly'
-                self.fields[field].label += " (Only for Admin)"  # Append label indicating admin-only
+                if field in self.fields:
+                    self.fields[field].widget.attrs['readonly'] = True
+                    self.fields[field].label += " (Admin only)"
+
+    class Meta:
+        model = ShegarLandForm
+        fields = [
+            'Kutaamagaalaa', 'Aanaa', 'iddo_adda', 'lakk_adda', 'gosa_tajajila',
+            'madda_lafa', 'tajajila_iddo', 'haala_beenya', 'qamaa_qophaef',
+            'tajajila_qophaef', 'balina_lafa', 'lakk_xalayaa_murtoo', 'sadarka_iddo',
+            'gosa_investimentii', 'sababa_qophaef', 'kan_qophesse', 'guyya_qophae',
+            'bal_lafa_bahi_tae', 'bal_lafa_hafe', 'qaama_bahi_tahef',
+            'tajajila_bahi_tahef', 'kan_bahi_taasise', 'ragaittin_bahi_tae',
+            'guyyaa_bahi_tae', 'guyya_galmae'
+        ]
+        exclude = ['user', 'geom']
 
     def clean_lakk_adda(self):
         lakk_adda = self.cleaned_data.get('lakk_adda')
-        if lakk_adda < 0:
+        if lakk_adda is not None and lakk_adda < 0:
             raise forms.ValidationError("Lakk adda must be a positive integer.")
         return lakk_adda
 
-    def clean_Ragaa_biroo(self):
-        Ragaa_biroo = self.cleaned_data.get('Ragaa_biroo', None)  # Ensure this matches your model field
-        if Ragaa_biroo is None:  # If no file is uploaded
-            return None  # Return None instead of raising an error
-        return Ragaa_biroo  # Return the uploaded file if it exists
 from django import forms
-from .models import Publication
+from .models import Parcel
 
-class PublicationForm(forms.ModelForm):
+class ParcelForm(forms.ModelForm):
     class Meta:
-        model = Publication
-        fields = ['title', 'description', 'pdf_file']
+        model = Parcel
+        exclude = ['owner', 'geom']
+        widgets = {
+            'guyya_qophae': forms.DateInput(attrs={'type': 'date'}),
+            'guyya_galmae': forms.DateInput(attrs={'type': 'date'}),
+        }

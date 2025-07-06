@@ -1,4 +1,3 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -284,30 +283,19 @@
     <li><a href="{% url 'register' %}">Galma'uuf/Sign Up</a></li>
     <li><a href="{% url 'login' %}">Seenuuf/Sign In</a></li>
     <li><a href="{% url 'map_view' %}">Map page</a></li>
+     <li><a href="{% url 'add_parcel' %}">Create Parcel</a></li>
+      <li><a href="{% url 'parcel_list' %}">parcel list</a></li>
     <li><a href="{% url 'dashboard' %}">Ragaa Bankii Lafaa/Dashboard</a></li>
-       <!-- Services Dropdown -->
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Services / Tajaajiloota
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
-        <li><a class="dropdown-item" href="{% url 'submit_form' %}">Galmee qophii fi bankii/Forms</a></li>
-        <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">Ragaa bankii waligalaa/Admin dashboard</a></li>
-        <li><a class="dropdown-item" href="{% url 'report' %}">Gabaasaa/Report</a></li>
-
-        <!-- Publication Section Inside the Dropdown -->
-        <li>
-            <a class="dropdown-item disabled" href="#">Publications</a>
-        </li>
-        {% for publication in publications %}
-        <li>
-            <a class="dropdown-item" href="{% url 'publication_list' %}">Publications</a>
-        </li>
-        {% empty %}
-        <li><a class="dropdown-item disabled" href="#">No publications available</a></li>
-        {% endfor %}
-    </ul>
-</li>
+        <!-- Dropdown Menu -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Services / Tajaajiloota
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                <li><a class="dropdown-item" href="{% url 'submit_form' %}">Galmee qophii fi bankii/Forms</a></li>
+                <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">Ragaa bankii waligalaa/Admin dashboard</a></li>
+                <li><a class="dropdown-item" href="{% url 'report' %}">Gabaasaa/Report</a></li>. 
+            </ul>
         </li>
     <li><a href="{% url 'about' %}">Odeffannoo/About</a></li>
 </ul>

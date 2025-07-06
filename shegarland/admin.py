@@ -16,10 +16,10 @@ class ShegarLandFormAdmin(admin.ModelAdmin):
         'qamaa_qophaef',
         'tajajila_qophaef',
         'balina_lafa',
+        'sadarka_iddo', 
+        'gosa_investimentii',
+        'sababa_qophaef',
         'kan_qophesse',
-        'shapefile',
-        'Ragaa_biroo',
-        'Mallattoo',
         'bal_lafa_bahi_tae',
         'bal_lafa_hafe',
         'qaama_bahi_tahef',
@@ -49,8 +49,7 @@ class ShegarLandFormAdmin(admin.ModelAdmin):
         'Kutaamagaalaa', 'Aanaa', 'iddo_adda', 'lakk_adda', 
         'gosa_tajajila', 'madda_lafa', 'tajajila_iddo', 
         'haala_beenya', 'qamaa_qophaef', 'tajajila_qophaef', 
-        'balina_lafa', 'kan_qophesse', 'guyya_qophae', 'guyya_galmae',  
-        'shapefile', 'Ragaa_biroo', 'Mallattoo',  
+        'balina_lafa', 'kan_qophesse', 'guyya_qophae', 'guyya_galmae',    
         'bal_lafa_bahi_tae', 'bal_lafa_hafe', 
         'qaama_bahi_tahef', 'tajajila_bahi_tahef',
         'kan_bahi_taasise', 'guyyaa_bahi_tae', 'ragaittin_bahi_tae'
@@ -67,12 +66,14 @@ class ShegarLandFormAdmin(admin.ModelAdmin):
 
         super().save_model(request, obj, form, change)
 
+from django.contrib import admin
+from .models import Parcel
+from django.contrib.gis.admin import GISModelAdmin
+
+@admin.register(Parcel)
+class ParcelAdmin(GISModelAdmin):
+    list_display = ('Kutaamagaalaa', 'Aanaa', 'madda_lafa', 'balina_lafa', 'gosa_tajajila')
+
 # Register the model
 admin.site.register(ShegarLandForm, ShegarLandFormAdmin)
 
-
-from .models import Publication
-
-@admin.register(Publication)
-class PublicationAdmin(admin.ModelAdmin):
-    list_display = ('title', 'uploaded_at')

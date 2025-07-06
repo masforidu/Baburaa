@@ -33,10 +33,9 @@ from .views import (
     mark_as_read,
     mark_as_unread,
     unread_notifications_count_view,
-    map_view,# Added this import
-    publication_list, 
-    download_publication,
-    publication_detail,
+    map_view,
+    add_parcel,
+    parcel_list,
 )
 
 urlpatterns = [
@@ -90,9 +89,8 @@ urlpatterns = [
 
     # Unread Notifications Count
     path('notifications/unread_count/', unread_notifications_count_view, name='unread_notifications_count'),
+    path('add/',add_parcel, name='add_parcel'),
+    path('list/',parcel_list, name='parcel_list'),
 
-    path('publications/', publication_list, name='publication_list'),
-    path('publication/<int:pk>/', publication_detail, name='publication_detail'),
-    path('download_publication/<int:pk>/', download_publication, name='download_publication'),
 
 ]
