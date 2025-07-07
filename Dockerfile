@@ -13,12 +13,10 @@ RUN apt-get update && apt-get install -y \
     libgdal-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# ✅ Set GDAL environment variables for pip build
-ENV GDAL_VERSION=3.6.2
-ENV GDAL_LIBRARY_PATH=/usr/lib/libgdal.so
+# ✅ Correct GDAL path
+ENV GDAL_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgdal.so
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
-
 # Set working directory
 WORKDIR /app
 
