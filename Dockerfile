@@ -22,18 +22,16 @@ ENV C_INCLUDE_PATH=/usr/include/gdal
 # Set working directory
 WORKDIR /app
 
-# Copy requirements file and install dependencies
+# Copy requirements file
 COPY requirements.txt /app/
 
-# ✅ Install inside virtual environment
+# ✅ Create virtualenv and install dependencies into it
 RUN python -m venv /opt/venv && \
-    . /opt/venv/bin/activate && \
-    pip install --upgrade pip && \
-    pip install -r requirements.txt && \
-    which gunicorn
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install -r requirements.txt
 
-# Copy rest of the project
+# Copy the full project
 COPY . /app/
 
-# Run the Django app with Gunicorn
-CMD ["gunicorn", "shegar.wsgi:application", "--bind", "0.0.0.0:8000"]
+# ✅ Explicitly use gunicorn from the virtual environment
+CMD ["/opt/venv/bin/gunicorn", "shegar.wsgi:application", "--bind", "0.0.0.0:8000"]
