@@ -1,11 +1,9 @@
 # Base image
 FROM python:3.12-slim  
 
-# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install GDAL and system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
@@ -13,23 +11,23 @@ RUN apt-get update && apt-get install -y \
     libgdal-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# ✅ Correct GDAL path
 ENV GDAL_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgdal.so
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
-# Set working directory
+ENV PORT=8000
+
 WORKDIR /app
 
-# Copy requirements file
 COPY requirements.txt /app/
 
-# ✅ Create virtualenv and install dependencies into it
 RUN python -m venv /opt/venv && \
-    /opt/venv/bin/pip install --upgrade pip && \
-    /opt/venv/bin/pip install -r requirements.txt
+    . /opt/venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt
 
-# Copy the full project
 COPY . /app/
 
-# ✅ Explicitly use gunicorn from the virtual environment
-CMD ["/opt/venv/bin/gunicorn", "shegar.wsgi:application", "--bind", "0.0.0.0:8000"]
+# ✅ Collect static files
+RUN . /opt/venv/bin/activate && python manage.py collectstatic --noinput
+
+CMD ["gunicorn", "shegar.wsgi:application", "--bind", "0.0.0.0:$PORT"]
