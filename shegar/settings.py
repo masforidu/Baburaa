@@ -5,12 +5,8 @@ from dotenv import load_dotenv
 from environ import Env
 
 # ✅ Required for GIS fields
-# Remove local Windows paths:
-# GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal310.dll'
-# GEOS_LIBRARY_PATH = r'C:\OSGeo4W\bin\geos_c.dll'
-
-# These are only valid inside Docker
-GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH", "/usr/lib/libgdal.so")
+GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal310.dll'
+GEOS_LIBRARY_PATH = r'C:\OSGeo4W\bin\geos_c.dll'
 
 # Load environment variables
 env = Env()
@@ -120,10 +116,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = '/media/'
